@@ -202,8 +202,6 @@ def _get_mice_color(code: str) -> str:
     }
     return colors.get(code, "bg-gray-100 border-gray-300")
 
-def _truncate(text: str, max_length: int = 50) -> str:
-    return text[:max_length] + "..." if len(text) > max_length else text
 
 def _get_try_color(cycle_type: str) -> str:
     colors = {
@@ -233,12 +231,12 @@ def _render_nesting_diagram(mice_cards):
             ),
             air.Div(
                 air.Span("↓ ", class_="text-green-600 font-bold"),
-                air.Span(_truncate(card.opening, 30), class_="text-xs"),
+                air.Span(card.opening, class_="text-xs"),
                 class_="mb-1"
             ),
             air.Div(
                 air.Span("↑ ", class_="text-purple-600 font-bold"),
-                air.Span(_truncate(card.closing, 30), class_="text-xs"),
+                air.Span(card.closing, class_="text-xs"),
             ),
             class_=f"border-l-4 pl-2 mb-2 {_get_mice_color(card.code).replace('bg-', 'border-')}",
             style=f"margin-left: {indent}px;"
@@ -258,16 +256,33 @@ def _render_story_timeline(mice_cards, try_cards):
     act1_items = [
         air.Li(
             air.Span(f"{card.code}: ", class_="font-bold"),
-            air.Span(_truncate(card.opening, 40), class_="text-sm")
+            air.Span(card.opening, class_="text-sm")
         )
         for card in sorted_mice
     ]
 
-    # Act 2: Try/Fail cycles
+    # Act 2: Try/Fail cycles with all fields
     act2_items = [
         air.Li(
-            air.Span(f"{card.type} #{card.order_num}: ", class_="font-bold"),
-            air.Span(_truncate(card.attempt, 35), class_="text-sm")
+            air.Div(
+                air.Span(f"{card.type} #{card.order_num}", class_="font-bold text-sm"),
+                class_="mb-1"
+            ),
+            air.Div(
+                air.Span("Attempt: ", class_="font-bold text-xs"),
+                air.Span(card.attempt, class_="text-xs"),
+                class_="mb-1"
+            ),
+            air.Div(
+                air.Span("Failure: ", class_="font-bold text-xs"),
+                air.Span(card.failure, class_="text-xs"),
+                class_="mb-1"
+            ),
+            air.Div(
+                air.Span("Consequence: ", class_="font-bold text-xs"),
+                air.Span(card.consequence, class_="text-xs")
+            ),
+            class_="mb-3"
         )
         for card in sorted_tries
     ]
@@ -276,7 +291,7 @@ def _render_story_timeline(mice_cards, try_cards):
     act3_items = [
         air.Li(
             air.Span(f"{card.code}: ", class_="font-bold"),
-            air.Span(_truncate(card.closing, 40), class_="text-sm")
+            air.Span(card.closing, class_="text-sm")
         )
         for card in reversed(sorted_mice)
     ]
@@ -318,17 +333,17 @@ def _render_try_card(card: TryCard):
         ),
         air.Div(
             air.Span("Attempt: ", class_="font-bold text-xs"),
-            air.Span(_truncate(card.attempt, 40), class_="text-xs"),
+            air.Span(card.attempt, class_="text-xs"),
             class_="mb-1"
         ),
         air.Div(
             air.Span("Failure: ", class_="font-bold text-xs"),
-            air.Span(_truncate(card.failure, 40), class_="text-xs"),
+            air.Span(card.failure, class_="text-xs"),
             class_="mb-1"
         ),
         air.Div(
             air.Span("Consequence: ", class_="font-bold text-xs"),
-            air.Span(_truncate(card.consequence, 40), class_="text-xs"),
+            air.Span(card.consequence, class_="text-xs"),
             class_="mb-2"
         ),
         air.Div(
@@ -368,7 +383,7 @@ def _render_mice_card(card: MiceCard):
     def _info_span(icon: str, text: str, extra_class: str = ""):
         return air.Div(
             air.Span(icon, class_="font-bold"),
-            air.Span(_truncate(text)),
+            air.Span(text),
             class_=f"mb-2 text-sm {extra_class}"
         )
 
@@ -398,7 +413,7 @@ def _render_mice_card(card: MiceCard):
             class_="mt-2"
         ),
         class_=f"card border-2 p-3 {_get_mice_color(card.code)}",
-        style="width: 290px; height: 200px;",
+        style="height: auto; min-height: 200px;",
         id=f"mice-card-{card.id}"
     )
 
