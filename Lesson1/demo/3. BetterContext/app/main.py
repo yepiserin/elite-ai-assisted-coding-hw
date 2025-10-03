@@ -132,10 +132,28 @@ def _render_try_card(card: TryCard):
         air.Div(
             air.Span("Consequence: ", class_="font-bold text-xs"),
             air.Span(_truncate(card.consequence, 40), class_="text-xs"),
-            class_="mb-0"
+            class_="mb-2"
+        ),
+        air.Div(
+            air.Button(
+                "Edit",
+                class_="btn btn-xs btn-primary mr-2",
+                hx_get=f"/try-edit/{card.id}",
+                hx_target=f"#try-card-{card.id}",
+                hx_swap="outerHTML"
+            ),
+            air.Button(
+                "Delete",
+                class_="btn btn-xs btn-error",
+                hx_delete=f"/try-cards/{card.id}",
+                hx_target="body",
+                hx_swap="outerHTML",
+                hx_confirm="Are you sure you want to delete this Try card?"
+            ),
+            class_="flex gap-2"
         ),
         class_=f"card border-2 p-3 {_get_try_color(card.type)}",
-        style="height: 175px;",
+        style="height: auto; max-height: 250px; overflow-auto;",
         id=f"try-card-{card.id}"
     )
 
@@ -586,4 +604,129 @@ def add_sample_try():
             )
         )
 
+@app.get("/try-edit/{card_id}")
+def try_edit(card_id: int):
+    with Session(engine) as session:
+        card = session.get(TryCard, card_id)
+        if not card:
+            return ""
+
+        def _form_field(label, input_element):
+            return air.Div(
+                air.Label(label, class_="label"),
+                input_element,
+                class_="form-control"
+            )
+
+        return air.Form(
+            _form_field(
+                "Type:",
+                air.Select(
+                    air.Option("Success", value="Success", selected=(card.type == "Success")),
+                    air.Option("Failure", value="Failure", selected=(card.type == "Failure")),
+                    air.Option("Trade-off", value="Trade-off", selected=(card.type == "Trade-off")),
+                    air.Option("Moral", value="Moral", selected=(card.type == "Moral")),
+                    name="type",
+                    class_="select select-bordered select-sm w-full"
+                )
+            ),
+            _form_field(
+                "Order #:",
+                air.Input(
+                    type="number",
+                    name="order_num",
+                    value=str(card.order_num),
+                    class_="input input-bordered input-sm w-full"
+                )
+            ),
+            _form_field(
+                "Attempt:",
+                air.Textarea(
+                    card.attempt,
+                    name="attempt",
+                    class_="textarea textarea-bordered textarea-sm w-full",
+                    rows="1"
+                )
+            ),
+            _form_field(
+                "Failure:",
+                air.Textarea(
+                    card.failure,
+                    name="failure",
+                    class_="textarea textarea-bordered textarea-sm w-full",
+                    rows="1"
+                )
+            ),
+            _form_field(
+                "Consequence:",
+                air.Textarea(
+                    card.consequence,
+                    name="consequence",
+                    class_="textarea textarea-bordered textarea-sm w-full",
+                    rows="1"
+                )
+            ),
+            air.Div(
+                air.Button(
+                    "Save",
+                    type="submit",
+                    class_="btn btn-success btn-xs mr-2"
+                ),
+                air.Button(
+                    "Cancel",
+                    type="button",
+                    class_="btn btn-ghost btn-xs",
+                    hx_get=f"/try-card/{card.id}",
+                    hx_target=f"#try-card-{card.id}",
+                    hx_swap="outerHTML"
+                ),
+                class_="mt-2"
+            ),
+            hx_put=f"/try-cards/{card.id}",
+            hx_target=f"#try-card-{card.id}",
+            hx_swap="outerHTML",
+            class_="card bg-base-100 shadow-lg p-2",
+            style="height: auto;",
+            id=f"try-card-{card.id}"
+        )
+
+@app.get("/try-card/{card_id}")
+def get_try_card(card_id: int):
+    with Session(engine) as session:
+        card = session.get(TryCard, card_id)
+        if not card:
+            return ""
+        return _render_try_card(card)
+
+@app.put("/try-cards/{card_id}")
+def update_try_card(
+    card_id: int,
+    type: str = Form(...),
+    order_num: int = Form(...),
+    attempt: str = Form(...),
+    failure: str = Form(...),
+    consequence: str = Form(...)
+):
+    with Session(engine) as session:
+        card = session.get(TryCard, card_id)
+        if card:
+            card.type = type
+            card.order_num = order_num
+            card.attempt = attempt
+            card.failure = failure
+            card.consequence = consequence
+            session.add(card)
+            session.commit()
+            session.refresh(card)
+            return _render_try_card(card).render()
+    return ""
+
+@app.delete("/try-cards/{card_id}")
+def delete_try_card(card_id: int):
+    with Session(engine) as session:
+        card = session.get(TryCard, card_id)
+        if card:
+            session.delete(card)
+            session.commit()
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
 
