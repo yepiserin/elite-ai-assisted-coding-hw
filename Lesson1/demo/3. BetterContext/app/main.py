@@ -20,11 +20,19 @@ def index():
     return story_builder_layout(
         air.Title("Story Builder"),
         air.Div(
-            air.H1("Story Builder", class_="text-4xl font-bold mb-4"),
-            air.P(
-                air.A("API Docs", target="_blank", href="/api/docs", class_="btn btn-primary")
+            air.Div(
+                air.H2("MICE Cards", class_="text-2xl font-bold mb-4"),
+                class_="border border-base-300 p-4"
             ),
-            class_="card bg-base-100 shadow-xl p-8 max-w-4xl mx-auto"
+            air.Div(
+                air.H2("Try/Fail Cycles", class_="text-2xl font-bold mb-4"),
+                class_="border border-base-300 p-4"
+            ),
+            air.Div(
+                air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
+                class_="border border-base-300 p-4"
+            ),
+            class_="grid grid-cols-3 gap-4 w-full"
         )
     )
 
