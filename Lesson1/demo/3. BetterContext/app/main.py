@@ -259,10 +259,20 @@ def _render_story_timeline(mice_cards, try_cards):
         class_="mt-4"
     )
 
+def _get_try_tooltip(cycle_type: str) -> str:
+    """Get tooltip text for Try/Fail card type."""
+    tooltips = {
+        "Success": "Yes, but... - Character succeeds at immediate goal but the larger problem persists. Example: Hero defeats minion but villain escapes.",
+        "Failure": "No, and... - Character fails and situation worsens. Example: Detective's suspect has alibi AND another murder occurs.",
+        "Trade-off": "Yes, but at a cost - Character wins something but loses something else. Example: Hero saves city but loses their powers.",
+        "Moral": "Success with ethical compromise - Character succeeds but violates their values. Example: Detective catches killer by breaking the law."
+    }
+    return tooltips.get(cycle_type, "")
+
 def _render_try_card(card: TryCard):
     return air.Div(
         air.Div(
-            air.Span(f"{card.type} #{card.order_num}", class_="font-bold"),
+            air.Span(f"{card.type} #{card.order_num}", class_="font-bold tooltip", data_tip=_get_try_tooltip(card.type)),
             class_="mb-2"
         ),
         air.Div(
@@ -303,6 +313,16 @@ def _render_try_card(card: TryCard):
         id=f"try-card-{card.id}"
     )
 
+def _get_mice_tooltip(code: str) -> str:
+    """Get tooltip text for MICE card type."""
+    tooltips = {
+        "M": "Milieu: Story about a place/environment. Character enters → explores → leaves. Example: Alice falls down rabbit hole, explores Wonderland, returns home.",
+        "I": "Idea: Story about a question/mystery. Question posed → investigated → answered. Example: Whodunit mystery starts with murder, detective investigates, reveals killer.",
+        "C": "Character: Story about internal change. Character dissatisfied → struggles → transforms. Example: Scrooge is miserly, faces ghosts, becomes generous.",
+        "E": "Event: Story about external problem. World order disrupted → crisis → new order. Example: Alien invasion threatens Earth, heroes fight back, peace restored."
+    }
+    return tooltips.get(code, "")
+
 def _render_mice_card(card: MiceCard):
     def _info_span(icon: str, text: str, extra_class: str = ""):
         return air.Div(
@@ -313,7 +333,7 @@ def _render_mice_card(card: MiceCard):
 
     return air.Div(
         air.Div(
-            air.Span(f"{card.code}", class_="text-lg font-bold"),
+            air.Span(f"{card.code}", class_="text-lg font-bold tooltip tooltip-right", data_tip=_get_mice_tooltip(card.code)),
             air.Span(f" Level {card.nesting_level}", class_="text-sm"),
             class_="mb-2"
         ),
