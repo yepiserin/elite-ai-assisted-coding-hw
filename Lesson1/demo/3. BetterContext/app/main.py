@@ -25,6 +25,16 @@ def index():
         return story_builder_layout(
             air.Title("Story Builder"),
             air.Div(
+                air.Button(
+                    "Seed Sample Data",
+                    class_="btn btn-secondary mb-4",
+                    hx_post="/seed-data",
+                    hx_target="body",
+                    hx_swap="outerHTML"
+                ),
+                class_="mb-4"
+            ),
+            air.Div(
                 air.Div(
                     air.H2("MICE Cards", class_="text-2xl font-bold mb-4"),
                     air.Button(
@@ -317,6 +327,42 @@ def create_try_card(
             consequence=consequence
         )
         session.add(try_card)
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/seed-data")
+def seed_data():
+    with Session(engine) as session:
+        # Clear existing data
+        session.exec(select(MiceCard)).all()
+        session.exec(select(TryCard)).all()
+        for card in session.exec(select(MiceCard)):
+            session.delete(card)
+        for card in session.exec(select(TryCard)):
+            session.delete(card)
+
+        # Create sample MICE cards at different nesting levels
+        mice_cards_data = [
+            {"code": "M", "opening": "A detective arrives in a mysterious coastal town", "closing": "She leaves, having solved the mystery and found peace", "nesting_level": 1},
+            {"code": "I", "opening": "She discovers the town has a dark secret", "closing": "The truth about the town's past is revealed", "nesting_level": 2},
+            {"code": "C", "opening": "She meets a reclusive lighthouse keeper", "closing": "The keeper becomes her trusted ally", "nesting_level": 3},
+            {"code": "E", "opening": "A storm traps everyone in the town", "closing": "The storm passes, bringing clarity", "nesting_level": 4},
+        ]
+
+        for data in mice_cards_data:
+            session.add(MiceCard(**data))
+
+        # Create sample Try/Fail cycles
+        try_cards_data = [
+            {"type": "Success", "order_num": 1, "attempt": "She interviews the townspeople", "failure": "They all give contradictory stories", "consequence": "She realizes someone is lying"},
+            {"type": "Failure", "order_num": 2, "attempt": "She searches the lighthouse at night", "failure": "She gets caught in a trap", "consequence": "The keeper rescues her, earning her trust"},
+            {"type": "Trade-off", "order_num": 3, "attempt": "She confronts the mayor publicly", "failure": "It causes panic in the town", "consequence": "But it forces the guilty party to make a mistake"},
+        ]
+
+        for data in try_cards_data:
+            session.add(TryCard(**data))
+
         session.commit()
 
     return Response(status_code=200, headers={"HX-Redirect": "/"})
