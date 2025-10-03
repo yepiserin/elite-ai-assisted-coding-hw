@@ -81,6 +81,8 @@ def index():
                     air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
                     air.H3("Nesting Structure", class_="text-lg font-semibold mb-2"),
                     _render_nesting_diagram(mice_cards),
+                    air.H3("Story Timeline", class_="text-lg font-semibold mb-2 mt-6"),
+                    _render_story_timeline(mice_cards, try_cards),
                     class_="border border-base-300 p-4"
                 ),
                 class_="grid grid-cols-3 gap-4 w-full"
@@ -148,6 +150,57 @@ def _render_nesting_diagram(mice_cards):
     return air.Div(
         *[render_nested_card(card, card.nesting_level) for card in sorted_cards],
         class_="bg-base-100 p-3 rounded"
+    )
+
+def _render_story_timeline(mice_cards, try_cards):
+    """Render three-act story timeline."""
+    sorted_mice = sorted(mice_cards, key=lambda c: c.nesting_level)
+    sorted_tries = sorted(try_cards, key=lambda c: c.order_num)
+
+    # Act 1: MICE openings in nesting order
+    act1_items = [
+        air.Li(
+            air.Span(f"{card.code}: ", class_="font-bold"),
+            air.Span(_truncate(card.opening, 40), class_="text-sm")
+        )
+        for card in sorted_mice
+    ]
+
+    # Act 2: Try/Fail cycles
+    act2_items = [
+        air.Li(
+            air.Span(f"{card.type} #{card.order_num}: ", class_="font-bold"),
+            air.Span(_truncate(card.attempt, 35), class_="text-sm")
+        )
+        for card in sorted_tries
+    ]
+
+    # Act 3: MICE closings in reverse order
+    act3_items = [
+        air.Li(
+            air.Span(f"{card.code}: ", class_="font-bold"),
+            air.Span(_truncate(card.closing, 40), class_="text-sm")
+        )
+        for card in reversed(sorted_mice)
+    ]
+
+    return air.Div(
+        air.Div(
+            air.H4("Act 1: Setup", class_="font-bold text-green-700 mb-2"),
+            air.Ul(*act1_items, class_="list-disc list-inside space-y-1") if act1_items else air.P("No openings", class_="text-gray-500 italic text-sm"),
+            class_="bg-green-50 p-3 rounded mb-3"
+        ),
+        air.Div(
+            air.H4("Act 2: Confrontation", class_="font-bold text-blue-700 mb-2"),
+            air.Ul(*act2_items, class_="list-disc list-inside space-y-1") if act2_items else air.P("No try/fail cycles", class_="text-gray-500 italic text-sm"),
+            class_="bg-blue-50 p-3 rounded mb-3"
+        ),
+        air.Div(
+            air.H4("Act 3: Resolution", class_="font-bold text-purple-700 mb-2"),
+            air.Ul(*act3_items, class_="list-disc list-inside space-y-1") if act3_items else air.P("No closings", class_="text-gray-500 italic text-sm"),
+            class_="bg-purple-50 p-3 rounded"
+        ),
+        class_="mt-4"
     )
 
 def _render_try_card(card: TryCard):
