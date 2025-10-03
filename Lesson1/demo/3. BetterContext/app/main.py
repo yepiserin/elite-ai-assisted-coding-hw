@@ -1,5 +1,5 @@
 import air
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel, Session, create_engine, select
 from models import MiceCard, TryCard
 from layouts import story_builder_layout
 
@@ -17,30 +17,69 @@ app = air.Air()
 
 @app.get("/")
 def index():
-    return story_builder_layout(
-        air.Title("Story Builder"),
-        air.Div(
+    with Session(engine) as session:
+        mice_cards = session.exec(select(MiceCard)).all()
+
+        return story_builder_layout(
+            air.Title("Story Builder"),
             air.Div(
-                air.H2("MICE Cards", class_="text-2xl font-bold mb-4"),
-                class_="border border-base-300 p-4"
-            ),
-            air.Div(
-                air.H2("Try/Fail Cycles", class_="text-2xl font-bold mb-4"),
-                class_="border border-base-300 p-4"
-            ),
-            air.Div(
-                air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
-                class_="border border-base-300 p-4"
-            ),
-            class_="grid grid-cols-3 gap-4 w-full"
+                air.Div(
+                    air.H2("MICE Cards", class_="text-2xl font-bold mb-4"),
+                    air.Div(
+                        *[_render_mice_card(card) for card in mice_cards],
+                        class_="flex flex-col gap-3"
+                    ),
+                    class_="border border-base-300 p-4"
+                ),
+                air.Div(
+                    air.H2("Try/Fail Cycles", class_="text-2xl font-bold mb-4"),
+                    class_="border border-base-300 p-4"
+                ),
+                air.Div(
+                    air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
+                    class_="border border-base-300 p-4"
+                ),
+                class_="grid grid-cols-3 gap-4 w-full"
+            )
         )
-    )
 
 def _info_row(label, value):
     return air.Div(
         air.Span(label, class_="font-bold"),
         air.Span(f" {value}"),
         class_="mb-2"
+    )
+
+def _get_mice_color(code: str) -> str:
+    colors = {
+        "M": "bg-blue-100 border-blue-300",
+        "I": "bg-green-100 border-green-300",
+        "C": "bg-yellow-100 border-yellow-300",
+        "E": "bg-purple-100 border-purple-300"
+    }
+    return colors.get(code, "bg-gray-100 border-gray-300")
+
+def _truncate(text: str, max_length: int = 50) -> str:
+    return text[:max_length] + "..." if len(text) > max_length else text
+
+def _render_mice_card(card: MiceCard):
+    def _info_span(icon: str, text: str, extra_class: str = ""):
+        return air.Div(
+            air.Span(icon, class_="font-bold"),
+            air.Span(_truncate(text)),
+            class_=f"mb-2 text-sm {extra_class}"
+        )
+
+    return air.Div(
+        air.Div(
+            air.Span(f"{card.code}", class_="text-lg font-bold"),
+            air.Span(f" Level {card.nesting_level}", class_="text-sm"),
+            class_="mb-2"
+        ),
+        _info_span("↓ ", card.opening),
+        _info_span("↑ ", card.closing, extra_class="mb-0"),
+        class_=f"card border-2 p-3 {_get_mice_color(card.code)}",
+        style="width: 290px; height: 200px;"
     )
 
 @app.get("/add-sample-mice")
