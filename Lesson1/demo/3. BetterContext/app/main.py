@@ -44,6 +44,14 @@ def index():
                 ),
                 air.Div(
                     air.H2("Try/Fail Cycles", class_="text-2xl font-bold mb-4"),
+                    air.Button(
+                        "Add Try Card",
+                        class_="btn btn-primary mb-3",
+                        hx_get="/try-form",
+                        hx_target="#try-form-container",
+                        hx_swap="innerHTML"
+                    ),
+                    air.Div(id="try-form-container"),
                     air.Div(
                         *[_render_try_card(card) for card in try_cards],
                         class_="flex flex-col gap-3",
@@ -216,6 +224,102 @@ def mice_form():
 @app.get("/clear-form")
 def clear_form():
     return ""
+
+@app.get("/try-form")
+def try_form():
+    return air.Form(
+        air.Div(
+            air.Label("Cycle Type:", class_="label"),
+            air.Select(
+                air.Option("Success", value="Success"),
+                air.Option("Failure", value="Failure"),
+                air.Option("Trade-off", value="Trade-off"),
+                air.Option("Moral", value="Moral"),
+                name="type",
+                class_="select select-bordered w-full mb-2"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Order Number:", class_="label"),
+            air.Input(
+                type="number",
+                name="order_num",
+                value="1",
+                class_="input input-bordered w-full mb-2"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Attempt:", class_="label"),
+            air.Textarea(
+                name="attempt",
+                class_="textarea textarea-bordered w-full mb-2",
+                rows="2"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Failure:", class_="label"),
+            air.Textarea(
+                name="failure",
+                class_="textarea textarea-bordered w-full mb-2",
+                rows="2"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Consequence:", class_="label"),
+            air.Textarea(
+                name="consequence",
+                class_="textarea textarea-bordered w-full mb-2",
+                rows="2"
+            ),
+            class_="form-control"
+        ),
+        air.Button(
+            "Save",
+            type="submit",
+            class_="btn btn-success mr-2"
+        ),
+        air.Button(
+            "Cancel",
+            type="button",
+            class_="btn btn-ghost",
+            hx_get="/clear-try-form",
+            hx_target="#try-form-container",
+            hx_swap="innerHTML"
+        ),
+        hx_post="/try-cards",
+        hx_target="body",
+        hx_swap="outerHTML",
+        class_="card bg-base-100 shadow-lg p-4 mb-3"
+    )
+
+@app.get("/clear-try-form")
+def clear_try_form():
+    return ""
+
+@app.post("/try-cards")
+def create_try_card(
+    type: str = Form(...),
+    order_num: int = Form(...),
+    attempt: str = Form(...),
+    failure: str = Form(...),
+    consequence: str = Form(...)
+):
+    with Session(engine) as session:
+        try_card = TryCard(
+            type=type,
+            order_num=order_num,
+            attempt=attempt,
+            failure=failure,
+            consequence=consequence
+        )
+        session.add(try_card)
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
 
 @app.get("/mice-edit/{card_id}")
 def mice_edit(card_id: int):
