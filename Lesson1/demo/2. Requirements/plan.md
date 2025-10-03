@@ -1,126 +1,228 @@
-# Mice Craft — MVP Plan
+# Story Builder with MICE Quotient — Product Requirements
 
-This document captures the requirements and implementation plan for the Mice Craft MVP (three-act outline editor). It's intentionally minimal and focused on the user's directions: help novice writers create a three-act outline with a simple card-based left pane and a markdown outline on the right.
+This document defines the product requirements for a web-based story outlining tool that helps writers structure narratives using the MICE Quotient framework (Milieu, Inquiry, Character, Event) with Try/Fail cycles.
 
-## Goal (MVP)
-- Provide a simple, persistent, desktop-first web app that helps novice writers build a three-act outline using cards.
-- Left: vertical card area grouped by Act 1 & 3, and then Act 2. Cards are created, edited, deleted, and reordered (drag-and-drop) within their section
-- Right: a Markdown-rendered bulleted outline generated on-demand via a Refresh button.
-- Persistence: server-side using SQLite. No user accounts, no admin, no export, no real-time collaboration.
+## Product Vision
 
-## Key assumptions (confirmed)
-- Backend: AIR (FastAPI-based) with Jinja templates.
-- Styling: Tailwind + DaisyUI via CDN.
-- Multiple stories supported (user can create/open multiple named stories).
-- Cards cannot move across acts. Reordering is only within the same act.
-- Deleting a card is permanent (removed from DB).
-- Autosave is acceptable; I'll recommend autosave on create/edit/reorder for simplicity.
+A single-page web application that enables novice writers to visually construct story outlines using the MICE Quotient framework. The tool provides an educational, card-based interface where users can create nested story elements and see their narrative structure visualized in real-time.
 
-## Minimal data model
-Use SQLite with two tables: `stories` and `cards`.
+## Core User Experience
 
-stories
-- id INTEGER PRIMARY KEY
-- title TEXT NOT NULL
-- description TEXT NULL
-- created_at TIMESTAMP
-- updated_at TIMESTAMP
+The application presents a three-column layout:
 
-cards
-- id INTEGER PRIMARY KEY
-- story_id INTEGER NOT NULL -- foreign key to stories(id)
-- kind TEXT NOT NULL CHECK(kind IN ('mice','act2')) -- 'mice' == Act1&3 card, 'act2' == Try card
-- position INTEGER NOT NULL -- ordering within section (1-based)
-- title TEXT NOT NULL
-- open_body TEXT NULL -- for MICE cards: Act 1 (opening) content, supports Markdown
-- close_body TEXT NULL -- for MICE cards: Act 3 (closing) content, supports Markdown
-- body TEXT NULL -- for Act2 (Try) cards: Act 2 content, supports Markdown
-- created_at TIMESTAMP
-- updated_at TIMESTAMP
+1. **MICE Cards (Left)**: Visual cards representing the four story elements (Milieu, Inquiry, Character, Event). Each card captures both an opening (Act 1) and closing (Act 3) for that narrative thread, plus a nesting level indicating story structure depth.
 
-Indexes: index on (story_id, kind, position) for efficient ordering queries.
+2. **Try/Fail Cycles (Center)**: Cards representing Act 2 story beats where characters attempt and fail/succeed in various ways. Four types supported:
+   - Escalation (No, AND): Failure makes things worse
+   - Complication (Yes, BUT): Success creates new problems
+   - Revelation (No, BUT): Failure reveals opportunity
+   - Resolution (Yes, AND): Success builds momentum
 
-Notes:
-- No extra metadata or tags in MVP.
-- `open_body`, `close_body`, and `body` support Markdown to enable richer card notes and for extracting content for the outline.
+3. **Generated Outline (Right)**: Real-time visualization showing both a nested structure diagram and a linear story flow from Act 1 through Act 3.
 
-## Outline rules (Mice Quotient ordering)
-- The outline is generated from the stored cards for a selected story. The outline displays three sections (Act 1, Act 2, Act 3) even though the editor shows two sections.
-- Ordering rules and mapping from stored cards to outline:
-   - Act 1: produced from all `mice` cards' `open_body` fields, listed in ascending `position` order (these are the openings/intros for each narrative thread).
-   - Act 2: produced from all `act2` cards' `body` fields, listed in ascending `position` order (the try/attempt blocks).
-   - Act 3: produced from all `mice` cards' `close_body` fields, listed in ascending `position` order. Conceptually Act 3 resolves the Act 1 threads (often in reverse open order), but for MVP the outline will list `close_body` items in stored order. (If you later want Act 3 to auto-order as reverse of Act 1, we can implement that.)
-- The Refresh button on the UI will request the server to re-render an outline (server-side) into Markdown, which will then be converted to HTML and displayed on the right.
+### 1. MICE Card Management
 
-## API surface (minimal)
-- GET /stories — list stories
--- POST /stories — create story (payload: { title, description? })
--- GET /stories/{id} — get story and its cards
--- POST /stories/{id}/cards — create card. Payload depends on card kind:
-   - For MICE (Act 1 & 3) cards: { card_kind: 'mice', title, open_body, close_body }
-   - For Act2 (Try) cards: { card_kind: 'act2', title, body }
--- PUT /cards/{id} — update card. Payload depends on card kind (mice vs act2) and may include `title`, `open_body`, `close_body`, or `body`.
--- DELETE /cards/{id} — delete card (permanent)
--- POST /stories/{id}/cards/reorder — reorder endpoint (payload: { section: 'mice'|'act2', ordered_card_ids: [id,...] }) — updates `position` values for the section
--- GET /stories/{id}/outline — returns the generated Markdown outline for the story
+**Card Types**: Four distinct types representing narrative elements:
+- **Milieu (M)**: Stories about exploring a place/setting
+- **Inquiry (I)**: Stories driven by seeking answers to questions
+- **Character (C)**: Stories about personal transformation
+- **Event (E)**: Stories about external conflicts/actions
 
-Notes:
-- For simplicity we'll use standard JSON request/response payloads for API endpoints used by client-side JS. The main pages will be Jinja templates plus fetch/XHR calls for create/edit/reorder/delete.
+**Card Properties**:
+- MICE type indicator (M, I, C, or E)
+- Opening text: What begins this narrative thread (Act 1)
+- Closing text: How this thread resolves (Act 3)
+- Nesting level: Integer 1-4+ indicating structural depth
 
-## UI layout and behavior
-Pages / Templates:
-- `index.html` — shows list of stories with Create button and link to each story.
--- `story_edit.html` — main editor for a story; left column: cards grouped into two sections (Act 1 & 3 combined as MICE cards, and Act 2 as Try cards); right column: outline area with Refresh button.
+**Visual Design**:
+- Each MICE type has distinct color coding and icon
+- Cards display abbreviated content with tooltips showing full educational details
+- Cards are fixed-height (approximately 200px) and fixed-width (approximately 290px)
+- Opening and closing text are both visible but truncated with ellipsis
 
-Story editor details (left column):
-- Left column shows two stacked sections (vertical scroll): first "Act 1 & 3 (MICE cards)" and then "Act 2 (Try cards)". The whole left area scrolls vertically.
-- The "Act 1 & 3" section contains MICE-style cards. Each MICE card represents a narrative thread with an opening (Act 1) and a closing (Act 3). The MICE card stores an `open_body` (Act 1 content) and a `close_body` (Act 3 content).
-- The "Act 2" section contains Try cards. Each Try card stores a single `body` (Act 2 content).
-- Each section shows its cards in order. Each card shows `title` and truncated preview of the relevant body (for MICE cards show a short preview of `open_body`).
-- Controls for each card: Edit (inline or small expand), Delete.
-- A small "New Card" control per section (creates a new card at the end of that section). When creating a card in the "Act 1 & 3" section the UI should collect both opening and closing text (can be separate fields or a single editor with explicit open/close areas).
-- Reordering: drag-and-drop enabled only within a section (MICE or Act2). When reorder completes, client calls `POST /stories/{id}/cards/reorder` with the section and the new ordered IDs for that section; server updates `position` and returns success.
-- Editing: clicking a card opens an inline editor (expand to reveal the relevant textareas and a text input for `title`) — on blur or on Save the client POSTs update; server persists and returns updated card.
+**Card Operations**:
+- Add new MICE card via form with type selector, opening/closing textareas, and nesting level input
+- Edit existing card inline (replaces card with form)
+- Delete card permanently
+- No drag-and-drop reordering for MICE cards
 
-Outline area (right column):
-- Shows a Refresh button at top. When clicked, it GETs `/stories/{id}/outline` and replaces the right column with rendered HTML of the returned Markdown.
-- Simple styling: bulleted list; Markdown headings for acts (e.g., "Act 1") and card titles/body as nested bullets.
+### 2. Try/Fail Cycle Management
 
-## Save strategy
-- Autosave recommended: create/edit/delete/reorder operations are persisted immediately with API calls. This minimizes UI complexity and eliminates an explicit Save button.
-- The Refresh button only controls outline (presentation), not persistence.
+**Cycle Types**: Four patterns of story progression:
+- **Escalation (No, AND)**: Failure that makes things worse
+- **Complication (Yes, BUT)**: Success that creates new problems
+- **Revelation (No, BUT)**: Failure that reveals opportunity
+- **Resolution (Yes, AND)**: Success that builds momentum
 
-## Deletion semantics
-- Deleting a card permanently removes it from the `cards` table. There is no trash for MVP.
+**Card Properties**:
+- Cycle type indicator
+- Order number (explicit sequencing)
+- Attempt: What the character tries to do
+- Outcome: What actually happens (failure/success)
+- Consequence: The result or what's learned
 
-## Seed content
-- Recommend providing a single demo story with a few example cards to illustrate the three-act flow. This will help new users understand the Mice Quotient structure.
+**Visual Design**:
+- Each cycle type has distinct color coding and icon
+- Cards show drag handle (⋮⋮) for reordering
+- Cards display order number prominently
+- Fixed-height (approximately 175px) and fixed-width
+- All three fields (Try/Result/Learn) visible but truncated
 
-## Implementation milestones (small, 1–2 week total for a single developer)
-1. Project scaffolding and wiring (1–2 days)
-   - Create AIR/FastAPI app, SQLite setup, basic Jinja templating, static assets for Tailwind & DaisyUI via CDN.
-2. Data model & DB migrations (1 day)
-   - Implement `stories` and `cards` tables and small migration script or SQL init.
-3. Stories CRUD + list page (1 day)
-   - Implement `/stories` endpoints and `index.html`.
-4. Story editor UI + cards CRUD (2–3 days)
-   - Create `story_edit.html` with left cards grouped into two sections (Act1&3 MICE cards, and Act2 Try cards), create/edit/delete card endpoints, inline editor and autosave.
-5. Drag-and-drop within-act reorder (1–2 days)
-   - Implement JS drag-and-drop (native HTML5 or lightweight lib) and `/cards/reorder` endpoint.
-6. Outline generation + Refresh button (0.5–1 day)
-   - Implement `/stories/{id}/outline` to render Markdown from DB content and show it in the right column.
-7. Polish, seed content, tests (1–2 days)
-   - Add a demo story, basic unit tests (pytest) for models and outline generation, small smoke test for endpoints.
+**Card Operations**:
+- Add new Try card via form with type selector and three text fields
+- Edit existing card inline
+- Delete card permanently
+- Drag-and-drop reordering within the Try cards section only
+- Order numbers update automatically after drag-and-drop
 
-## Acceptance criteria
-- Create, open, and delete multiple stories.
--- Create/edit/delete MICE and Act2 cards; edits persist immediately.
--- Drag-and-drop reorders cards within their section and reorder persists.
-- Right column renders the outline when Refresh is clicked and reflects persisted card order and content.
-- No user accounts required; everything stored server-side in SQLite and survives server restart.
+### 3. Story Outline Generation & Visualization
 
-## Edge cases and notes
-- When reordering, positions should be normalized (1..N) for that act to avoid gaps.
-- Concurrency: With no user accounts and low user counts, last-write-wins is acceptable. If multiple clients edit the same story concurrently, changes may overwrite each other.
-- Large story sizes are not going to be a concern in MVP
-- AI features, export, sharing, mobile-first UI, or admin UI are out of scope for MVP.
+**Nesting Structure Diagram**:
+- Visual representation showing MICE cards organized by nesting level
+- Nested boxes indicating structural depth (level 1 contains level 2, etc.)
+- Each box shows abbreviated card content with arrows (↓ for opening, ↑ for closing)
+- Automatically updates when MICE cards are added, edited, or deleted
+
+**Story Flow Timeline**:
+- Linear three-act view showing narrative progression
+- Act 1: Lists all MICE card openings in nesting order (outside-in: 1→2→3→4)
+- Act 2: Lists all Try/Fail cycles in order with icon, attempt, and outcome
+- Act 3: Lists all MICE card closings in reverse nesting order (inside-out: 4→3→2→1)
+- Color-coded sections (green for Act 1, blue for Act 2, purple for Act 3)
+
+**AI-Generated Outline**:
+- "Generate Outline" button triggers AI processing
+- Sends all cards to AI service with structured prompt
+- Returns formatted prose outline displayed in dedicated area
+- Outline persists until regenerated
+
+### 4. Educational Features
+
+**MICE Theory Panel**:
+- Expandable/collapsible panel explaining the MICE Quotient framework
+- Grid display of all four MICE types with:
+  - Full name, description, and real-world examples (e.g., "Lord of the Rings" for Milieu)
+  - Color-coded boxes matching card design
+- Explanation of nesting concept: how stories open outside-in and close inside-out
+- Try/Fail cycle explanation with all four types, patterns, and examples
+
+**In-Context Help**:
+- Tooltips on MICE cards showing detailed type information and examples
+- Tooltips on Try cards showing pattern and example scenario
+- Form fields include helper text guiding content creation
+
+### 5. Data Management & Templates
+
+**Sample Data**:
+- "Seed Sample Data" button populates database with example story
+- Sample includes multiple MICE cards at different nesting levels
+- Sample includes 3 Try/Fail cycles demonstrating different types
+- Demonstrates a complete story arc (e.g., child at summer camp overcoming shyness)
+
+**Story Templates**:
+- Template modal with pre-built story structures:
+  - Mystery Story: I-M-C-E structure with detection-focused Try cycles
+  - Adventure Story: M-E-C-I structure with quest-focused Try cycles
+  - Romance Story: C-M-E-I structure with relationship-focused Try cycles
+- Loading template clears existing data and populates with template cards
+- Each template includes 4 MICE cards and 3 Try cycles
+
+**Data Reset**:
+- "Clear All Data" button with confirmation dialog
+- Removes all cards from database
+- No undo mechanism
+
+### 6. Data Model
+
+**MICE Cards Table** (`mice_cards`):
+- `id`: Auto-incrementing primary key
+- `story_id`: Foreign key (currently defaults to 1, multi-story support deferred)
+- `code`: MICE type (M, I, C, or E)
+- `opening`: Act 1 content (text)
+- `closing`: Act 3 content (text)
+- `nesting_level`: Integer indicating structural depth
+
+**Try Cards Table** (`try_cards`):
+- `id`: Auto-incrementing primary key
+- `story_id`: Foreign key (currently defaults to 1)
+- `type`: Try/Fail type (full string like "Escalation (No, AND)")
+- `attempt`: What character tries (text)
+- `failure`: What actually happens (text)
+- `consequence`: Result/learning (text)
+- `order_num`: Explicit sequence number
+
+**Persistence Requirements**:
+- All card operations (add/edit/delete/reorder) persist immediately to SQLite
+- Database survives server restart
+- No user accounts or authentication
+- Single-user assumption (no concurrency handling needed)
+
+## Interaction Patterns
+
+### MICE Card Workflow
+1. User clicks "Add MICE Card" button
+2. Form appears above existing cards with type selector, two textareas (opening/closing), and nesting level input
+3. User fills form and clicks Save
+4. Form disappears, new card appears in grid
+5. Nesting diagram automatically updates
+
+### Try Card Workflow
+1. User clicks "Add Try Card" button
+2. Form appears with cycle type selector, order number input, and three textareas
+3. User fills form and clicks Save
+4. Form disappears, new card appears in grid
+5. Story flow timeline automatically updates
+
+### Drag-and-Drop Workflow
+1. User grabs drag handle (⋮⋮) on Try card
+2. Card becomes semi-transparent while dragging
+3. Other cards shift to show drop position
+4. On drop, positions update visually
+5. Background request updates database order numbers
+6. Story flow timeline automatically updates
+
+### Edit Card Workflow
+1. User clicks "Edit" button on card
+2. Card is replaced by filled-out form
+3. Other cards remain visible
+4. User modifies fields and clicks Save
+5. Form disappears, updated card appears
+6. Relevant visualizations automatically update
+
+### Delete Card Workflow
+1. User clicks "Delete" button
+2. Card immediately disappears (no confirmation for MVP)
+3. Relevant visualizations automatically update
+
+### Outline Generation Workflow
+1. User arranges cards as desired
+2. User clicks "Generate Outline" button
+3. Loading state appears (button disabled or spinner)
+4. AI service processes all cards
+5. Formatted prose outline appears in dedicated section
+6. Outline remains until "Generate Outline" clicked again
+
+## Technical Constraints
+
+- **Browser Support**: Modern evergreen browsers (Chrome, Firefox, Safari, Edge)
+- **Database**: SQLite with two tables (mice_cards, try_cards)
+- **No Export**: No PDF, document, or data export functionality
+- **No Collaboration**: Single user editing at a time
+- **No History**: No undo/redo, no version history
+- **No Mobile Optimization**: Desktop-first design (responsive not required)
+- **AI Dependency**: Outline generation requires external AI service access
+
+## Out of Scope (MVP)
+
+- Multiple stories/projects (story_id exists but only ID=1 used)
+- User accounts, authentication, authorization
+- Sharing or collaboration features
+- Export to PDF, Word, or other formats
+- Mobile-responsive design
+- Undo/redo functionality
+- Auto-save indicators or status
+- Offline mode
+- Print-friendly views
+- Keyboard shortcuts
+- Accessibility features beyond basic HTML semantics
+- Admin interface or analytics
