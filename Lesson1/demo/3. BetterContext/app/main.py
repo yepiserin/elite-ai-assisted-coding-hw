@@ -20,6 +20,7 @@ app = air.Air()
 def index():
     with Session(engine) as session:
         mice_cards = session.exec(select(MiceCard)).all()
+        try_cards = session.exec(select(TryCard).order_by(TryCard.order_num)).all()
 
         return story_builder_layout(
             air.Title("Story Builder"),
@@ -43,6 +44,11 @@ def index():
                 ),
                 air.Div(
                     air.H2("Try/Fail Cycles", class_="text-2xl font-bold mb-4"),
+                    air.Div(
+                        *[_render_try_card(card) for card in try_cards],
+                        class_="flex flex-col gap-3",
+                        id="try-cards-list"
+                    ),
                     class_="border border-base-300 p-4"
                 ),
                 air.Div(
@@ -71,6 +77,41 @@ def _get_mice_color(code: str) -> str:
 
 def _truncate(text: str, max_length: int = 50) -> str:
     return text[:max_length] + "..." if len(text) > max_length else text
+
+def _get_try_color(cycle_type: str) -> str:
+    colors = {
+        "Success": "bg-green-100 border-green-300",
+        "Failure": "bg-red-100 border-red-300",
+        "Trade-off": "bg-orange-100 border-orange-300",
+        "Moral": "bg-blue-100 border-blue-300"
+    }
+    return colors.get(cycle_type, "bg-gray-100 border-gray-300")
+
+def _render_try_card(card: TryCard):
+    return air.Div(
+        air.Div(
+            air.Span(f"{card.type} #{card.order_num}", class_="font-bold"),
+            class_="mb-2"
+        ),
+        air.Div(
+            air.Span("Attempt: ", class_="font-bold text-xs"),
+            air.Span(_truncate(card.attempt, 40), class_="text-xs"),
+            class_="mb-1"
+        ),
+        air.Div(
+            air.Span("Failure: ", class_="font-bold text-xs"),
+            air.Span(_truncate(card.failure, 40), class_="text-xs"),
+            class_="mb-1"
+        ),
+        air.Div(
+            air.Span("Consequence: ", class_="font-bold text-xs"),
+            air.Span(_truncate(card.consequence, 40), class_="text-xs"),
+            class_="mb-0"
+        ),
+        class_=f"card border-2 p-3 {_get_try_color(card.type)}",
+        style="height: 175px;",
+        id=f"try-card-{card.id}"
+    )
 
 def _render_mice_card(card: MiceCard):
     def _info_span(icon: str, text: str, extra_class: str = ""):
