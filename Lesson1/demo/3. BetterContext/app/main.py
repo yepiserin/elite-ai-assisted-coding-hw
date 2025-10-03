@@ -87,9 +87,27 @@ def _render_mice_card(card: MiceCard):
             class_="mb-2"
         ),
         _info_span("↓ ", card.opening),
-        _info_span("↑ ", card.closing, extra_class="mb-0"),
+        _info_span("↑ ", card.closing),
+        air.Div(
+            air.Button(
+                "Edit",
+                class_="btn btn-xs btn-primary mr-1",
+                hx_get=f"/mice-edit/{card.id}",
+                hx_target=f"#mice-card-{card.id}",
+                hx_swap="outerHTML"
+            ),
+            air.Button(
+                "Delete",
+                class_="btn btn-xs btn-error",
+                hx_delete=f"/mice-cards/{card.id}",
+                hx_target=f"#mice-card-{card.id}",
+                hx_swap="outerHTML"
+            ),
+            class_="mt-2"
+        ),
         class_=f"card border-2 p-3 {_get_mice_color(card.code)}",
-        style="width: 290px; height: 200px;"
+        style="width: 290px; height: 200px;",
+        id=f"mice-card-{card.id}"
     )
 
 @app.get("/mice-form")
@@ -156,6 +174,119 @@ def mice_form():
 
 @app.get("/clear-form")
 def clear_form():
+    return ""
+
+@app.get("/mice-edit/{card_id}")
+def mice_edit(card_id: int):
+    with Session(engine) as session:
+        card = session.get(MiceCard, card_id)
+        if not card:
+            return ""
+
+        def _form_field(label, input_element):
+            return air.Div(
+            air.Label(label, class_="label"),
+            input_element,
+            class_="form-control"
+            )
+
+        return air.Form(
+            _form_field(
+            "Type:",
+            air.Select(
+                air.Option("Milieu", value="M", selected=(card.code == "M")),
+                air.Option("Idea", value="I", selected=(card.code == "I")),
+                air.Option("Character", value="C", selected=(card.code == "C")),
+                air.Option("Event", value="E", selected=(card.code == "E")),
+                name="code",
+                class_="select select-bordered w-full mb-1"
+            )
+            ),
+            _form_field(
+            "Opening:",
+            air.Textarea(
+                card.opening,
+                name="opening",
+                class_="textarea textarea-bordered w-full mb-1",
+                rows="2"
+            )
+            ),
+            _form_field(
+            "Closing:",
+            air.Textarea(
+                card.closing,
+                name="closing",
+                class_="textarea textarea-bordered w-full mb-1",
+                rows="2"
+            )
+            ),
+            _form_field(
+            "Nesting Level:",
+            air.Input(
+                type="number",
+                name="nesting_level",
+                value=str(card.nesting_level),
+                class_="input input-bordered w-full mb-1"
+            )
+            ),
+            air.Button(
+            "Save",
+            type="submit",
+            class_="btn btn-success btn-xs mr-2"
+            ),
+            air.Button(
+            "Cancel",
+            type="button",
+            class_="btn btn-ghost btn-xs",
+            hx_get=f"/mice-card/{card_id}",
+            hx_target=f"#mice-card-{card_id}",
+            hx_swap="outerHTML"
+            ),
+            hx_put=f"/mice-cards/{card_id}",
+            hx_target=f"#mice-card-{card_id}",
+            hx_swap="outerHTML",
+            class_=f"card border-2 p-3 {_get_mice_color(card.code)} overflow-auto",
+            style="width: 290px; height: auto; max-height: 400px;",
+            id=f"mice-card-{card_id}"
+        )
+
+@app.get("/mice-card/{card_id}")
+def mice_card(card_id: int):
+    with Session(engine) as session:
+        card = session.get(MiceCard, card_id)
+        if not card:
+            return ""
+        return _render_mice_card(card)
+
+@app.put("/mice-cards/{card_id}")
+def update_mice_card(
+    card_id: int,
+    code: str = Form(...),
+    opening: str = Form(...),
+    closing: str = Form(...),
+    nesting_level: int = Form(...)
+):
+    with Session(engine) as session:
+        card = session.get(MiceCard, card_id)
+        if not card:
+            return ""
+
+        card.code = code
+        card.opening = opening
+        card.closing = closing
+        card.nesting_level = nesting_level
+        session.commit()
+        session.refresh(card)
+
+        return _render_mice_card(card).render()
+
+@app.delete("/mice-cards/{card_id}")
+def delete_mice_card(card_id: int):
+    with Session(engine) as session:
+        card = session.get(MiceCard, card_id)
+        if card:
+            session.delete(card)
+            session.commit()
     return ""
 
 @app.post("/mice-cards")
