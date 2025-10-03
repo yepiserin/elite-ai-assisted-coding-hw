@@ -26,11 +26,9 @@ def index():
             air.Title("Story Builder"),
             air.Div(
                 air.Button(
-                    "Seed Sample Data",
-                    class_="btn btn-secondary mr-2",
-                    hx_post="/seed-data",
-                    hx_target="body",
-                    hx_swap="outerHTML"
+                    "Templates",
+                    class_="btn btn-info mr-2",
+                    onclick="document.getElementById('templates-modal').showModal()"
                 ),
                 air.Button(
                     "Clear All Data",
@@ -41,6 +39,49 @@ def index():
                     hx_confirm="Are you sure you want to delete all cards? This cannot be undone."
                 ),
                 class_="mb-4"
+            ),
+            air.Dialog(
+                air.Div(
+                    air.H3("Story Templates", class_="text-2xl font-bold mb-4"),
+                    air.P("Choose a template to get started with a pre-built story structure:", class_="mb-4"),
+                    air.Div(
+                        air.Button(
+                            air.H4("🔍 Mystery", class_="text-xl font-bold mb-2"),
+                            air.P("A detective investigates a murder in a small town", class_="text-sm"),
+                            class_="btn btn-outline w-full text-left h-auto py-4 mb-3",
+                            hx_post="/load-template/mystery",
+                            hx_target="body",
+                            hx_swap="outerHTML",
+                            onclick="document.getElementById('templates-modal').close()"
+                        ),
+                        air.Button(
+                            air.H4("🗺️ Adventure", class_="text-xl font-bold mb-2"),
+                            air.P("A hero embarks on a quest to save their homeland", class_="text-sm"),
+                            class_="btn btn-outline w-full text-left h-auto py-4 mb-3",
+                            hx_post="/load-template/adventure",
+                            hx_target="body",
+                            hx_swap="outerHTML",
+                            onclick="document.getElementById('templates-modal').close()"
+                        ),
+                        air.Button(
+                            air.H4("💕 Romance", class_="text-xl font-bold mb-2"),
+                            air.P("Two people find love against all odds", class_="text-sm"),
+                            class_="btn btn-outline w-full text-left h-auto py-4 mb-3",
+                            hx_post="/load-template/romance",
+                            hx_target="body",
+                            hx_swap="outerHTML",
+                            onclick="document.getElementById('templates-modal').close()"
+                        ),
+                    ),
+                    air.Button(
+                        "Cancel",
+                        class_="btn btn-ghost mt-2",
+                        onclick="document.getElementById('templates-modal').close()"
+                    ),
+                    class_="modal-box"
+                ),
+                id="templates-modal",
+                class_="modal"
             ),
             air.Div(
                 air.Div(
@@ -523,41 +564,6 @@ def create_try_card(
 
     return Response(status_code=200, headers={"HX-Redirect": "/"})
 
-@app.post("/seed-data")
-def seed_data():
-    with Session(engine) as session:
-        # Clear existing data
-        session.exec(select(MiceCard)).all()
-        session.exec(select(TryCard)).all()
-        for card in session.exec(select(MiceCard)):
-            session.delete(card)
-        for card in session.exec(select(TryCard)):
-            session.delete(card)
-
-        # Create sample MICE cards at different nesting levels
-        mice_cards_data = [
-            {"code": "M", "opening": "A detective arrives in a mysterious coastal town", "closing": "She leaves, having solved the mystery and found peace", "nesting_level": 1},
-            {"code": "I", "opening": "She discovers the town has a dark secret", "closing": "The truth about the town's past is revealed", "nesting_level": 2},
-            {"code": "C", "opening": "She meets a reclusive lighthouse keeper", "closing": "The keeper becomes her trusted ally", "nesting_level": 3},
-            {"code": "E", "opening": "A storm traps everyone in the town", "closing": "The storm passes, bringing clarity", "nesting_level": 4},
-        ]
-
-        for data in mice_cards_data:
-            session.add(MiceCard(**data))
-
-        # Create sample Try/Fail cycles
-        try_cards_data = [
-            {"type": "Success", "order_num": 1, "attempt": "She interviews the townspeople", "failure": "They all give contradictory stories", "consequence": "She realizes someone is lying"},
-            {"type": "Failure", "order_num": 2, "attempt": "She searches the lighthouse at night", "failure": "She gets caught in a trap", "consequence": "The keeper rescues her, earning her trust"},
-            {"type": "Trade-off", "order_num": 3, "attempt": "She confronts the mayor publicly", "failure": "It causes panic in the town", "consequence": "But it forces the guilty party to make a mistake"},
-        ]
-
-        for data in try_cards_data:
-            session.add(TryCard(**data))
-
-        session.commit()
-
-    return Response(status_code=200, headers={"HX-Redirect": "/"})
 
 @app.post("/clear-data")
 def clear_data():
@@ -568,6 +574,108 @@ def clear_data():
         # Delete all Try cards
         for card in session.exec(select(TryCard)):
             session.delete(card)
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/load-template/mystery")
+def load_template_mystery():
+    with Session(engine) as session:
+        # Clear existing data
+        for card in session.exec(select(MiceCard)):
+            session.delete(card)
+        for card in session.exec(select(TryCard)):
+            session.delete(card)
+
+        # Create Mystery template MICE cards
+        mice_cards_data = [
+            {"code": "M", "opening": "Detective arrives in fog-shrouded coastal town where everyone seems suspicious", "closing": "Detective leaves the town, now peaceful and welcoming, mystery solved", "nesting_level": 1},
+            {"code": "I", "opening": "Who killed the wealthy lighthouse keeper? Why was the body moved?", "closing": "The killer was the keeper's business partner, hiding embezzlement scheme", "nesting_level": 2},
+            {"code": "C", "opening": "Detective haunted by unsolved case from her past, struggles to trust her instincts", "closing": "Detective learns to trust herself again, finds closure on both cases", "nesting_level": 3},
+            {"code": "E", "opening": "Hurricane warning issued - all evidence must be gathered before evacuation", "closing": "Hurricane passes, evidence preserved, arrest made just in time", "nesting_level": 4},
+        ]
+
+        for data in mice_cards_data:
+            session.add(MiceCard(**data))
+
+        # Create Mystery template Try/Fail cycles
+        try_cards_data = [
+            {"type": "Success", "order_num": 1, "attempt": "Detective interviews all townspeople for alibis", "failure": "Everyone has an alibi, but stories have inconsistencies", "consequence": "Realizes someone is lying, narrows suspects to three people"},
+            {"type": "Failure", "order_num": 2, "attempt": "Searches lighthouse for physical evidence before storm", "failure": "Storm hits early, evidence washed away by flooding", "consequence": "Must rely on testimonies and deduction instead of forensics"},
+            {"type": "Trade-off", "order_num": 3, "attempt": "Confronts prime suspect publicly to force confession", "failure": "Suspect denies everything, town turns against detective", "consequence": "Gains access to suspect's financial records in the chaos"},
+        ]
+
+        for data in try_cards_data:
+            session.add(TryCard(**data))
+
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/load-template/adventure")
+def load_template_adventure():
+    with Session(engine) as session:
+        # Clear existing data
+        for card in session.exec(select(MiceCard)):
+            session.delete(card)
+        for card in session.exec(select(TryCard)):
+            session.delete(card)
+
+        # Create Adventure template MICE cards
+        mice_cards_data = [
+            {"code": "M", "opening": "Hero leaves peaceful village to journey through dangerous enchanted forest", "closing": "Hero returns home victorious, village saved and celebrating", "nesting_level": 1},
+            {"code": "I", "opening": "What ancient artifact can defeat the dragon threatening the kingdom?", "closing": "The artifact is the hero's family heirloom - a dragon-forged blade", "nesting_level": 2},
+            {"code": "C", "opening": "Reluctant hero doubts their worthiness, fears they'll fail like their father", "closing": "Hero accepts their destiny, realizes courage isn't absence of fear", "nesting_level": 3},
+            {"code": "E", "opening": "Dragon awakens early, attacks begin - kingdom will fall in seven days", "closing": "Dragon defeated, ancient threat ended, peace restored to the land", "nesting_level": 4},
+        ]
+
+        for data in mice_cards_data:
+            session.add(MiceCard(**data))
+
+        # Create Adventure template Try/Fail cycles
+        try_cards_data = [
+            {"type": "Success", "order_num": 1, "attempt": "Hero seeks wise hermit's guidance on finding the artifact", "failure": "Hermit speaks only in riddles, no clear answer given", "consequence": "Hero deciphers one clue - must seek the mountain temple"},
+            {"type": "Failure", "order_num": 2, "attempt": "Climbs treacherous mountain to reach ancient temple", "failure": "Avalanche destroys path, temple guardian refuses entry", "consequence": "Forced to prove worth through dangerous trial by combat"},
+            {"type": "Trade-off", "order_num": 3, "attempt": "Makes bargain with forest spirits for magical protection", "failure": "Protection works but hero owes the spirits a future favor", "consequence": "Gains power needed but at unknown cost to be paid later"},
+        ]
+
+        for data in try_cards_data:
+            session.add(TryCard(**data))
+
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/load-template/romance")
+def load_template_romance():
+    with Session(engine) as session:
+        # Clear existing data
+        for card in session.exec(select(MiceCard)):
+            session.delete(card)
+        for card in session.exec(select(TryCard)):
+            session.delete(card)
+
+        # Create Romance template MICE cards
+        mice_cards_data = [
+            {"code": "M", "opening": "City lawyer forced to spend summer in small coastal town for work", "closing": "Lawyer chooses to stay in the town, makes it her permanent home", "nesting_level": 1},
+            {"code": "I", "opening": "Can two people from completely different worlds find common ground?", "closing": "Love transcends backgrounds - they complement each other perfectly", "nesting_level": 2},
+            {"code": "C", "opening": "Guarded workaholic afraid to open her heart after painful divorce", "closing": "Learns to trust again, opens herself to love and vulnerability", "nesting_level": 3},
+            {"code": "E", "opening": "Town's beloved community center faces demolition - she must defend it", "closing": "Community center saved through partnership, becomes symbol of their love", "nesting_level": 4},
+        ]
+
+        for data in mice_cards_data:
+            session.add(MiceCard(**data))
+
+        # Create Romance template Try/Fail cycles
+        try_cards_data = [
+            {"type": "Success", "order_num": 1, "attempt": "She agrees to coffee with handsome local boat captain", "failure": "They argue about city vs. small-town life constantly", "consequence": "Realizes their debates are actually playful chemistry, not conflict"},
+            {"type": "Failure", "order_num": 2, "attempt": "Plans romantic beach picnic to show she's changing", "failure": "Storm ruins picnic, she loses composure and pushes him away", "consequence": "He sees her vulnerability for first time, understands her fear"},
+            {"type": "Moral", "order_num": 3, "attempt": "Uses legal loophole to save community center temporarily", "failure": "Wins case but betrays town's trust by using manipulative tactics", "consequence": "Must choose between winning and being the person he fell for"},
+        ]
+
+        for data in try_cards_data:
+            session.add(TryCard(**data))
+
         session.commit()
 
     return Response(status_code=200, headers={"HX-Redirect": "/"})
