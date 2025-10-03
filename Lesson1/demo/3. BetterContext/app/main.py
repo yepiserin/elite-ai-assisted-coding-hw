@@ -79,6 +79,8 @@ def index():
                 ),
                 air.Div(
                     air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
+                    air.H3("Nesting Structure", class_="text-lg font-semibold mb-2"),
+                    _render_nesting_diagram(mice_cards),
                     class_="border border-base-300 p-4"
                 ),
                 class_="grid grid-cols-3 gap-4 w-full"
@@ -112,6 +114,41 @@ def _get_try_color(cycle_type: str) -> str:
         "Moral": "bg-blue-100 border-blue-300"
     }
     return colors.get(cycle_type, "bg-gray-100 border-gray-300")
+
+def _render_nesting_diagram(mice_cards):
+    """Render nested boxes showing MICE card structure by nesting level."""
+    if not mice_cards:
+        return air.Div("No MICE cards to display", class_="text-gray-500 italic")
+
+    # Sort by nesting level
+    sorted_cards = sorted(mice_cards, key=lambda c: c.nesting_level)
+
+    def render_nested_card(card, level):
+        """Render a single card with appropriate nesting indentation."""
+        indent = (level - 1) * 20  # 20px per level
+        return air.Div(
+            air.Div(
+                air.Span(f"{card.code}", class_=f"font-bold mr-2"),
+                air.Span(f"Level {card.nesting_level}", class_="text-xs"),
+                class_="mb-1"
+            ),
+            air.Div(
+                air.Span("↓ ", class_="text-green-600 font-bold"),
+                air.Span(_truncate(card.opening, 30), class_="text-xs"),
+                class_="mb-1"
+            ),
+            air.Div(
+                air.Span("↑ ", class_="text-purple-600 font-bold"),
+                air.Span(_truncate(card.closing, 30), class_="text-xs"),
+            ),
+            class_=f"border-l-4 pl-2 mb-2 {_get_mice_color(card.code).replace('bg-', 'border-')}",
+            style=f"margin-left: {indent}px;"
+        )
+
+    return air.Div(
+        *[render_nested_card(card, card.nesting_level) for card in sorted_cards],
+        class_="bg-base-100 p-3 rounded"
+    )
 
 def _render_try_card(card: TryCard):
     return air.Div(
@@ -506,9 +543,8 @@ def update_mice_card(
         card.closing = closing
         card.nesting_level = nesting_level
         session.commit()
-        session.refresh(card)
 
-        return _render_mice_card(card).render()
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
 
 @app.delete("/mice-cards/{card_id}")
 def delete_mice_card(card_id: int):
