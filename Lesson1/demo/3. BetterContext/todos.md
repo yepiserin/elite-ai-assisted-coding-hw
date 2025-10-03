@@ -61,26 +61,32 @@ Each step below adds one complete, testable feature. After each step, you should
 - Form saves card and refreshes display
 - Verify you can add new Try cards and see them appear
 
-## Step 10: Add Edit and Delete for Try cards
+## Step 10: Add "Seed Sample Data" button
+- Add button to populate database with example story
+- Create sample MICE cards at different nesting levels
+- Create sample Try/Fail cycles
+- Button clears existing data first, then adds sample
+- Verify sample data loads and displays correctly
+
+## Step 11: Add "Clear All Data" button
+- Add button to delete all cards from database
+- Add confirmation dialog before clearing
+- Verify all data is cleared and displays update
+
+## Step 12: Add Edit and Delete for Try cards
 - Add "Edit" button on each Try card
 - Add "Delete" button on each Try card
 - Create PUT and DELETE endpoints
 - Verify you can edit and delete Try cards
 
-## Step 11: Implement drag-and-drop reordering for Try cards
-- Add drag-and-drop functionality using HTML5 drag API or sortable library
-- When cards are reordered, update order_num in database
-- Cards automatically re-render in new order
-- Verify you can drag Try cards to reorder them
-
-## Step 12: Generate nesting structure diagram
+## Step 13: Generate nesting structure diagram
 - In right column, create visual nesting diagram
 - Display MICE cards organized by nesting level (nested boxes)
 - Show abbreviated content with ↓ for opening, ↑ for closing
 - Diagram updates automatically when MICE cards change
 - Verify diagram displays correctly and updates
 
-## Step 13: Generate story flow timeline (Act 1, 2, 3)
+## Step 14: Generate story flow timeline (Act 1, 2, 3)
 - Below nesting diagram in right column, create three-act timeline
 - Act 1: List MICE openings in nesting order (1→2→3→4)
 - Act 2: List Try/Fail cycles in order with icons
@@ -88,45 +94,33 @@ Each step below adds one complete, testable feature. After each step, you should
 - Color-code sections (green, blue, purple)
 - Verify timeline displays correctly and updates
 
-## Step 14: Add "Seed Sample Data" button
-- Add button to populate database with example story
-- Create sample MICE cards at different nesting levels
-- Create sample Try/Fail cycles
-- Button clears existing data first, then adds sample
-- Verify sample data loads and displays correctly
-
-## Step 15: Add "Clear All Data" button
-- Add button to delete all cards from database
-- Add confirmation dialog before clearing
-- Verify all data is cleared and displays update
-
-## Step 16: Add MICE Theory educational panel
+## Step 15: Add MICE Theory educational panel
 - Create expandable/collapsible panel explaining MICE Quotient
 - Display grid of all four MICE types with descriptions and examples
 - Explain nesting concept and Try/Fail cycles
 - Match color coding from cards
 - Verify panel displays and toggles correctly
 
-## Step 17: Add tooltips to cards
+## Step 16: Add tooltips to cards
 - Add tooltips to MICE cards showing detailed type info and examples
 - Add tooltips to Try cards showing pattern and example
 - Verify tooltips appear on hover
 
-## Step 18: Add story templates feature
+## Step 17: Add story templates feature
 - Create "Templates" button that opens a modal
 - Add three templates: Mystery, Adventure, Romance
 - Each template has 4 MICE cards and 3 Try cycles
 - Loading template clears data and populates with template
 - Verify templates load correctly
 
-## Step 19: Add AI outline generation
+## Step 18: Add AI outline generation
 - Add "Generate Outline" button in right column
 - Create endpoint that sends all cards to AI service
 - Display returned prose outline in dedicated area
 - Add loading state while AI processes
 - Verify outline generates and displays
 
-## Step 20: Polish and refinement
+## Step 10: Polish and refinement
 - Review all features for consistency
 - Ensure all automatic updates work correctly
 - Verify color coding and styling throughout
