@@ -14,9 +14,7 @@ def story_builder_layout(*children):
             air.Link(href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css", rel="stylesheet", type="text/css"),
             air.Script(src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"),
             air.Script(
-                src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js",
-                integrity="sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm",
-                crossorigin="anonymous"
+                src="https://unpkg.com/htmx.org@2.0.7"
             ),
             *head_tags
         ),

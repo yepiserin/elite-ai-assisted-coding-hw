@@ -1,4 +1,5 @@
 import air
+from fastapi import Form, Response
 from sqlmodel import SQLModel, Session, create_engine, select
 from models import MiceCard, TryCard
 from layouts import story_builder_layout
@@ -25,9 +26,18 @@ def index():
             air.Div(
                 air.Div(
                     air.H2("MICE Cards", class_="text-2xl font-bold mb-4"),
+                    air.Button(
+                        "Add MICE Card",
+                        class_="btn btn-primary mb-3",
+                        hx_get="/mice-form",
+                        hx_target="#mice-form-container",
+                        hx_swap="innerHTML"
+                    ),
+                    air.Div(id="mice-form-container"),
                     air.Div(
                         *[_render_mice_card(card) for card in mice_cards],
-                        class_="flex flex-col gap-3"
+                        class_="flex flex-col gap-3",
+                        id="mice-cards-list"
                     ),
                     class_="border border-base-300 p-4"
                 ),
@@ -81,6 +91,91 @@ def _render_mice_card(card: MiceCard):
         class_=f"card border-2 p-3 {_get_mice_color(card.code)}",
         style="width: 290px; height: 200px;"
     )
+
+@app.get("/mice-form")
+def mice_form():
+    return air.Form(
+        air.Div(
+            air.Label("Type:", class_="label"),
+            air.Select(
+                air.Option("Milieu", value="M"),
+                air.Option("Idea", value="I"),
+                air.Option("Character", value="C"),
+                air.Option("Event", value="E"),
+                name="code",
+                class_="select select-bordered w-full mb-2"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Opening:", class_="label"),
+            air.Textarea(
+                name="opening",
+                class_="textarea textarea-bordered w-full mb-2",
+                rows="3"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Closing:", class_="label"),
+            air.Textarea(
+                name="closing",
+                class_="textarea textarea-bordered w-full mb-2",
+                rows="3"
+            ),
+            class_="form-control"
+        ),
+        air.Div(
+            air.Label("Nesting Level:", class_="label"),
+            air.Input(
+                type="number",
+                name="nesting_level",
+                value="1",
+                class_="input input-bordered w-full mb-2"
+            ),
+            class_="form-control"
+        ),
+        air.Button(
+            "Save",
+            type="submit",
+            class_="btn btn-success mr-2"
+        ),
+        air.Button(
+            "Cancel",
+            type="button",
+            class_="btn btn-ghost",
+            hx_get="/clear-form",
+            hx_target="#mice-form-container",
+            hx_swap="innerHTML"
+        ),
+        hx_post="/mice-cards",
+        hx_target="body",
+        hx_swap="outerHTML",
+        class_="card bg-base-100 shadow-lg p-4 mb-3"
+    )
+
+@app.get("/clear-form")
+def clear_form():
+    return ""
+
+@app.post("/mice-cards")
+def create_mice_card(
+    code: str = Form(...),
+    opening: str = Form(...),
+    closing: str = Form(...),
+    nesting_level: int = Form(...)
+):
+    with Session(engine) as session:
+        mice_card = MiceCard(
+            code=code,
+            opening=opening,
+            closing=closing,
+            nesting_level=nesting_level
+        )
+        session.add(mice_card)
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
 
 @app.get("/add-sample-mice")
 def add_sample_mice():
