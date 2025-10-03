@@ -15,3 +15,4 @@ In order to complete this, you'll need several pieces of information:
 - If there's any doubt, stop me so that we can proceed forward together
 - You should always verify things are being done correctly by checking the documentation of air, which you have tools to inspect.  The best developers reference the documentation a lot.
 - After doing something, you should verify that it works. You have access to playwright, and the app is running on port 8000.  Anytime one of the app python files are edited the app auto-reloads so you don't have to worry about refreshing or restarting.
+- The air docs are great, you should always look for things in the docs directory to learn about air vs the source code when possible.
