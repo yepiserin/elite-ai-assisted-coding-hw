@@ -279,3 +279,110 @@ button {
 .btn-danger:hover {
     background-color: #d32f2f;
 }
+
+.move-controls {
+    display: inline-flex;
+    gap: 4px;
+    margin-right: 10px;
+}
+
+.btn-move {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.btn-move:hover:not(:disabled) {
+    background-color: #f0f0f0;
+}
+
+.btn-move:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.nesting-diagram h3, .story-flow h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.nest-item {
+    padding: 5px;
+    margin: 3px 0;
+    font-size: 0.85em;
+    border-radius: 3px;
+}
+
+.nest-item.opening {
+    background-color: #f0f0f0;
+}
+
+.nest-item.closing {
+    background-color: #e0e0e0;
+}
+
+.flow-item {
+    padding: 8px;
+    margin: 5px 0;
+    font-size: 0.9em;
+    border-radius: 3px;
+    background-color: white;
+}
+
+.act h4 {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+.theory-panel {
+    transition: all 0.3s ease;
+}
+
+.theory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.theory-card {
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+    border: 2px solid #ddd;
+}
+
+.theory-header {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    color: white;
+}
+
+.theory-header.M {
+    background-color: #ffeb3b;
+    color: #333;
+}
+
+.theory-header.I {
+    background-color: #2196f3;
+}
+
+.theory-header.C {
+    background-color: #4caf50;
+}
+
+.theory-header.E {
+    background-color: #ff5722;
+}
+
+.try-pattern {
+    padding: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
