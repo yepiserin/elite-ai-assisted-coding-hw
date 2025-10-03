@@ -27,10 +27,18 @@ def index():
             air.Div(
                 air.Button(
                     "Seed Sample Data",
-                    class_="btn btn-secondary mb-4",
+                    class_="btn btn-secondary mr-2",
                     hx_post="/seed-data",
                     hx_target="body",
                     hx_swap="outerHTML"
+                ),
+                air.Button(
+                    "Clear All Data",
+                    class_="btn btn-error",
+                    hx_post="/clear-data",
+                    hx_target="body",
+                    hx_swap="outerHTML",
+                    hx_confirm="Are you sure you want to delete all cards? This cannot be undone."
                 ),
                 class_="mb-4"
             ),
@@ -363,6 +371,19 @@ def seed_data():
         for data in try_cards_data:
             session.add(TryCard(**data))
 
+        session.commit()
+
+    return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/clear-data")
+def clear_data():
+    with Session(engine) as session:
+        # Delete all MICE cards
+        for card in session.exec(select(MiceCard)):
+            session.delete(card)
+        # Delete all Try cards
+        for card in session.exec(select(TryCard)):
+            session.delete(card)
         session.commit()
 
     return Response(status_code=200, headers={"HX-Redirect": "/"})
