@@ -13,6 +13,8 @@ By completing this assignment, you will learn to:
 
 Build a web application that helps writers outline short stories using Orson Scott Card's "MICE Quotient" structure (Milieu, Idea, Character, Event).
 
+Video Introduction: https://www.youtube.com/watch?v=UI5MwzSlPvs
+
 ### What Success Looks Like
 
 A successful solution will:
