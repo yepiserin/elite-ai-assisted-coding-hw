@@ -12,7 +12,7 @@ I did everything from the `2. Requirements` version.  As a reminder, that's this
 
 Then I also added these additional steps for this better context version:
 
-1. Added playwright MCP server.  You can do this with claude code:
+1. Added playwright MCP server.
 2. Added git MCP server for air.
 3. Gave some details on how to use tools and files in the AGENTS.md
 4. Decided to use claude code for parts of it, made a symlink from `CLAUDE.md` to `AGENTS.md` so I didn't have to have duplicate context
