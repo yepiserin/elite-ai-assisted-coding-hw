@@ -21,6 +21,7 @@ This assignment can be scaled in difficulty based on your abilities and experien
 Here's some ideas:
 
 **Level 1**
+
  Use the context I created, read it, and modify something about the app I created using the context and tools.  You don't have to do all of them, just pick one in an area that interests you.  Here's some ideas:
     - UI
         - Make it mobile friendly
