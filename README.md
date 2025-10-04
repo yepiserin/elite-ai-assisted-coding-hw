@@ -12,7 +12,7 @@ We thought about making the assignments based on something like a SaaS todo app.
 
 ## Homework Structure
 
-Each assignment directory has it's own `README.md` file.  That file will include:
+Each assignment directory has it's own `ASSIGNMENT_OVERVIEW.md` file and `ASSIGNMENT_CONCISE.md`.  That file will include:
 
 1. Information about the homework
 2. Variety of options for scaling difficulty up and down
