@@ -72,7 +72,7 @@ def _mice_edit_form(card: MiceCard) -> air.Form:
         hx_target=f"#mice-card-{card.id}",
         hx_swap="outerHTML",
         class_=f"card border-2 p-3 {MICE_COLORS[card.code]} overflow-auto",
-        style="width: 290px; height: auto; max-height: 400px;",
+        style="width: 100%; height: auto; min-height: 200px;",
         id=f"mice-card-{card.id}"
     )
 
