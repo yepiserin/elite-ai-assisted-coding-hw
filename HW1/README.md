@@ -32,7 +32,10 @@ You don't have to do all of them, just pick one in an area that interests you.  
         - Add users to make it a multi-user app
     - Features:
         - Add a create outline with AI feature
-        - Add exporting and a share features
+        - Add exporting and share features
+    - Quality:
+        - Add test suite
+        - Refactor to improve code quality
     
 **Level 2**
 
