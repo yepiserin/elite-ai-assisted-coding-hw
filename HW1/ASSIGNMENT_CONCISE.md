@@ -12,6 +12,8 @@ Some tasks need careful thought. Others are straightforward but time-consuming. 
 
 To make this work, AI needs tools. You have a mouse to click things in a browser. You can read documentation. Your AI should have the same capabilities. 
 
+Video Introduction: https://www.youtube.com/watch?v=UI5MwzSlPvs
+
 ## The Assignment
 
 **THE TASK:** Accumulate requirements, tools, and other context and then give that to AI to help you build something.
