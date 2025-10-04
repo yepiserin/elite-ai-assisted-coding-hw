@@ -40,8 +40,8 @@ You don't have to do all of them, just pick one in an area that interests you.  
 2. Create a new directory based on the `incomplete` app and just using your notes try to recreate the context.  After you feel like it's good, re-review the context I created to see if there's anything you think you missed that should be included.  Iterate back and forth until you feel like you got everything.
 3. Then start creating your app!  It's ok if it takes a few attempts, learn and improve the context each iteration as you see failures.
 
-![NOTE]
-It's ok to pick a different framework, like NextJS or Django or FastHTML!  Pick what you like, understand, and can work efficiently in.
+> ![NOTE]
+> It's ok to pick a different framework, like NextJS or Django or FastHTML!  Pick what you like, understand, and can work efficiently in.
 
 **Level 3**
 
