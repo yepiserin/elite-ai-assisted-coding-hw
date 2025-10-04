@@ -44,7 +44,7 @@ You don't have to do all of them, just pick one in an area that interests you.  
 3. Then start creating your app!  It's ok if it takes a few attempts, learn and improve the context each iteration as you see failures.
 
 > ![NOTE]
-> It's ok to pick a different framework, like NextJS or Django or FastHTML!  Pick what you like, understand, and can work efficiently in.
+> It's ok to pick a different framework, like NextJS, Django or FastHTML!  Pick what you like, understand, and can work efficiently in.
 
 **Level 3**
 
