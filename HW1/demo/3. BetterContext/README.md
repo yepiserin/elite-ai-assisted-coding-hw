@@ -27,6 +27,7 @@ Each tool has a slightly different way.  For the two I used
 ### Claude Code
 
 `claude mcp add playwright npx @playwright/mcp@latest`
+
 `claude mcp add air-docs npx mcp-remote https://gitmcp.io/feldroy/air` 
 
 ### Github copilot
