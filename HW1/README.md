@@ -1,3 +1,16 @@
+# HW 1
+
+This homework teaches you to give AI the right context.
+
+Good AI assistance doesn't mean AI writes everything while you stop thinking. It means AI handles the tedious parts so you can focus on what matters.
+
+Here's what that looks like: When you ask AI to add a button, it should click that button and check for errors—not wait for you to do it. When you need to understand an error, AI should reproduce it and show you the actual message instead of guessing. These things save time. They keep you from jumping between tasks. While AI gathers context, you work on something else.
+
+Another example: I'm building a UI with Daisy-UI / Tailwind. I know the classes, but while prototyping I don't want to type `btn-primary` or `btn-secondary` every time. I let AI fill in those details,Then I edit. The same goes for refactoring: moving code from inside a function to above it, wrapping it properly, naming it correctly. AI can do this mechanical work.
+
+Some tasks need careful thought. Others are straightforward but time-consuming. AI should handle the second kind and get close enough that you can quickly polish the result.
+
+To make this work, AI needs tools. You have a mouse to click things in a browser. You can read documentation. Your AI should have the same capabilities. 
 
 ## The Assignment
 
@@ -8,16 +21,26 @@ This assignment can be scaled in difficulty based on your abilities and experien
 Here's some ideas:
 
 **Level 1**
- Use the context I created, read it, and modify something about the app I created.  Here's some ideas:
-    - UI: Make it mobile friendly
-    - UI: Allow for re-ordering of the cards within sections.  Arrows or drag and drop
-    - UI: Improve the aesthetics of the AI Generated outline.
-    - Database: Use an ORM to improve the database management, and set up migrations
-    - Feature: Add a create outline with AI feature
+ Use the context I created, read it, and modify something about the app I created using the context and tools.  You don't have to do all of them, just pick one in an area that interests you.  Here's some ideas:
+    - UI
+        - Make it mobile friendly
+        - Allow for re-ordering of the cards within sections.  Arrows or drag and drop
+    - Data/Database:
+        - Set up database migrations with alembic
+        - Add users to make it a multi-user app
+    - Features:
+        - Add a create outline with AI feature
+        - Add exporting and a share features
 
 **Level 2**
 
-Read the context carefully to understand it, then re-create the context and make this specic app.  I recommend taking notes of the kinds of things you want to include in yours (such as tech stack) while reading my context!  Then, make a new directory and do it without looking at the specific context, just referencing your notes.  You can also rebuild it in the framework of your choosing.
+1. Read the context carefully to understand it and what is there.  Take notes on the *process* you think you would need to follow to recreate it.  Make notes on the kinds of things you want to include (Such as tech stack, acceptance criteria, tools, etc). 
+2. Create a new directory and just using your notes try to recreate the context.  After you feel like it's good, re-review the context I created to see if there's anything you think you missed that should be included.
+3. Then start creating your app!  It's ok if it takes a few attempts, learn and improve the context each iteration.
+
+![NOTE]
+It's ok to pick a different framework, like NextJS or Django or FastHTML!  Pick what you like, understand, and can work efficiently in.
+
 
 **Level 3**
 

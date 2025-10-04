@@ -2,24 +2,32 @@
 
 We're building a SaaS app to help writers outline short stories using Orson Scott Card's "Mice Quotient" structure.
 
+## Why Short Stories
+
+We thought about making the assignments based on something like a SaaS todo app.  We felt we wanted to replicate what it might be like to code an actual product. This fills that need because:
+
+1. Real products have some complexity that they are solving that isn't solved 10,000 times before
+2. I know it's a real product, because it's part of a real product i'm building!  (You're totally free to do anything with this, even release your own product!)
+3. Like a real product, you might have to learn a bit about how it's supposed to work while you create it.
+
 ## Homework Structure
 
-Each assignment has a demo and start/end points. Replicate the demo or adjust difficulty by:
+Each assignment directory has it's own `README.md` file.  That file will include:
 
-- Change the UI/styling (easier)
-- Switch frameworks—Next.js, Django, Flask (moderate)
-- Use different narrative structures (harder)
-- Build your own app applying these techniques (hardest)
-- Any other idea or deviation you have!
+1. Information about the homework
+2. Variety of options for scaling difficulty up and down
+
+You have lifetime access.  My recommmendation is start with the simplest ones and focus on doing them phenomenally well.  Then slowly build up in complexity.  If that takes you 2 weeks or 2 months or 6 months that's fine!
 
 ## Why Air?
 
 Air is a FastAPI-based web framework by Danny and Audrey Roy-Greenfeld.
 
 Why I'm using it:
+
 1. Built on FastAPI—proven foundation
-2. New—minimal training data. You'll work with context, not memorization
-3. I like it. Use what works for you.  If Air doesn't, do all the assignments in your framework of choice.
+2. New—minimal training data. You'll work with context, not memorization.
+3. I like it. Use what works for you.  If Air doesn't work for you, do all the assignments in your framework of choice.
 
 ## Why Something New?
 
