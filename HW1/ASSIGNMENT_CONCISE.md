@@ -12,7 +12,7 @@ Some tasks need careful thought. Others are straightforward but time-consuming. 
 
 To make this work, AI needs tools. You have a mouse to click things in a browser. You can read documentation. Your AI should have the same capabilities. 
 
-Video Introduction: https://www.youtube.com/watch?v=UI5MwzSlPvs
+Video Introduction: https://youtu.be/KsZwxlUF3vs
 
 > TIP: You can run the air app locally with `uv run fastapi dev`
 
