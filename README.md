@@ -1,6 +1,6 @@
 # Elite AI Assisted Coding Homework
 
-We're building a SaaS app to help writers outline short stories using Orson Scott Card's "Mice Quotient" structure.
+We're building a SaaS app to help writers outline short stories using Orson Scott Card's "MICE Quotient" structure.
 
 ## Why Short Stories
 
@@ -12,7 +12,7 @@ We thought about making the assignments based on something like a SaaS todo app.
 
 ## Homework Structure
 
-Each assignment directory has it's own `ASSIGNMENT_OVERVIEW.md` file and `ASSIGNMENT_CONCISE.md`.  That file will include:
+Each assignment directory has its own `ASSIGNMENT_OVERVIEW.md` file and `ASSIGNMENT_CONCISE.md`.  That file will include:
 
 1. Information about the homework
 2. Variety of options for scaling difficulty up and down
@@ -21,12 +21,12 @@ You have lifetime access.  My recommmendation is start with the simplest ones an
 
 ## Why Air?
 
-Air is a FastAPI-based web framework by Danny and Audrey Roy-Greenfeld.
+Air is a FastAPI-based web framework by Daniel and Audrey Roy Greenfeld.
 
 Why I'm using it:
 
 1. Built on FastAPI—proven foundation
-2. New—minimal training data. You'll work with context, not memorization.
+2. New — minimal training data. You'll work with context, not memorization.
 3. I like it. Use what works for you.  If Air doesn't work for you, do all the assignments in your framework of choice.
 
 ## Why Something New?
