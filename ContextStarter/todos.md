@@ -29,10 +29,10 @@
 ---
 
 ## Step 4: Time Input Selector
-- [ ] Add time picker dropdown with 30-minute increments
-- [ ] Use 12-hour format with AM/PM
-- [ ] Generate all time options (12:00 AM, 12:30 AM, 1:00 AM, etc.)
-- [ ] Display selected time on the page
+- [x] Add time picker dropdown with 30-minute increments
+- [x] Use 12-hour format with AM/PM
+- [x] Generate all time options (12:00 AM, 12:30 AM, 1:00 AM, etc.)
+- [x] Display selected time on the page
 
 **User Test:** Can select a time from dropdown and see it displayed.
 
