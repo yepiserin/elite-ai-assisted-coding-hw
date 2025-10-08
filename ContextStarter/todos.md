@@ -10,9 +10,9 @@
 ---
 
 ## Step 2: Basic Page Structure and Title
-- [ ] Change page title to "Time Zone Converter"
-- [ ] Add a descriptive subtitle or tagline
-- [ ] Switch to Pico CSS layout (as specified in plan)
+- [x] Change page title to "Time Zone Converter"
+- [x] Add a descriptive subtitle or tagline
+- [x] Switch to Pico CSS layout (as specified in plan)
 
 **User Test:** Page looks like a time zone converter app, not a generic hello world.
 
