@@ -1,9 +1,9 @@
 # Time Zone Converter - Development To-Dos
 
 ## Step 1: Hello World with Air Framework
-- [ ] Verify the basic Air app runs successfully
-- [ ] Test that you can access the app in browser at localhost
-- [ ] Confirm the "Hello, Air!" message displays correctly
+- [x] Verify the basic Air app runs successfully
+- [x] Test that you can access the app in browser at localhost
+- [x] Confirm the "Hello, Air!" message displays correctly
 
 **User Test:** Visit the app URL and see a working web page.
 
