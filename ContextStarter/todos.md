@@ -19,10 +19,10 @@
 ---
 
 ## Step 3: Source Time Zone Selector
-- [ ] Add dropdown for source time zone selection
-- [ ] Populate with 10-12 cities from the plan (San Francisco, Chicago, Washington D.C., London, Paris, Berlin, Manila, Tokyo, Singapore, Sydney)
-- [ ] Set Washington D.C. (America/New_York) as default selection
-- [ ] Display selected time zone on the page
+- [x] Add dropdown for source time zone selection
+- [x] Populate with 10-12 cities from the plan (San Francisco, Chicago, Washington D.C., London, Paris, Berlin, Manila, Tokyo, Singapore, Sydney)
+- [x] Set Washington D.C. (America/New_York) as default selection
+- [x] Display selected time zone on the page
 
 **User Test:** Can select a time zone from dropdown and see it reflected on the page.
 
