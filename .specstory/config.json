@@ -1,0 +1,22 @@
+{
+  "project": "Elite AI Assisted Coding Assignment",
+  "description": "MICE Quotient Story Builder with Drag-and-Drop Functionality",
+  "version": "1.0.0",
+  "capture_settings": {
+    "auto_capture": false,
+    "manual_start": true,
+    "inactivity_timeout_minutes": 30,
+    "include_code_changes": true,
+    "include_chat_history": true,
+    "include_file_operations": true,
+    "prompt_user_on_start": true
+  },
+  "output_format": "markdown",
+  "session_naming": "timestamp",
+  "session_management": {
+    "start_command": "specstory start",
+    "stop_command": "specstory stop",
+    "status_command": "specstory status",
+    "timeout_behavior": "auto_stop"
+  }
+}
