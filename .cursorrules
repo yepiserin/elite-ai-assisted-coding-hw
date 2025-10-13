@@ -1,0 +1,53 @@
+# Cursor Rules for Elite AI Assisted Coding Assignment
+
+## Primary Context Files
+- Read and follow instructions in: HW1/demo/4. Assignment/AGENTS.md
+- Reference requirements in: HW1/demo/4. Assignment/plan.md  
+- Follow development steps in: HW1/demo/4. Assignment/todos.md
+
+## Project Context
+This is an assignment for learning context-driven AI development. The goal is to enhance the MICE Quotient Story Builder application with drag-and-drop functionality for Try cards.
+
+## Key Requirements
+- Use type hinting where possible
+- Maintain separation of concerns without over-abstraction
+- No error handling - let the app fail to see full stack traces
+- Build real functionality, not mocks
+- Verify work using browser automation (app runs on port 8001)
+- Reference Air documentation when needed
+
+## SpecStory Session Management
+**CRITICAL**: Before starting any development work, you MUST ask the user about SpecStory sessions:
+
+1. **Always Prompt**: When the user starts using AI agents, immediately ask: "Would you like to start a SpecStory session to capture this development work?"
+
+2. **Session Control**: 
+   - Sessions are manual start/stop only
+   - 30-minute inactivity timeout
+   - User controls when to start and stop
+
+3. **Commands to Use**:
+   - Start: `specstory start` (run this when user confirms)
+   - Stop: `specstory stop` (run this when user wants to end)
+   - Status: `specstory status` (check if session is active)
+
+4. **Session Behavior**:
+   - No automatic capture
+   - User must explicitly start sessions
+   - Sessions auto-stop after 30 minutes of inactivity
+   - Always prompt before starting new sessions
+
+5. **Workflow**:
+   - Ask user about SpecStory session
+   - If yes: run `specstory start` and confirm session started
+   - If no: proceed with development work
+   - Remind user about session timeout (30 minutes)
+   - Ask if they want to extend session when approaching timeout
+
+## Current Focus
+Implementing Option B: Drag-and-Drop Reordering for Try cards with:
+- Sortable.js integration
+- Visual feedback system
+- Database batch updates
+- Error handling and rollback
+- Accessibility support
