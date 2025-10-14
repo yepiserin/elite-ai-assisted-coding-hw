@@ -53,6 +53,68 @@ The AI assistant got caught up in technical implementation and forgot to follow 
 **Process discipline is as important as technical implementation.** Even when focused on exciting technical work, following established workflows ensures we capture valuable development insights and maintain consistent documentation practices.
 
 ---
+
+## FastAPI Server Restart Issues - October 13, 2025
+
+### **The Problem**
+During development of the MICE Quotient Story Builder, we encountered a critical issue where MICE cards were not displaying despite:
+- ✅ Database containing 4 MICE cards with correct data
+- ✅ Database functions working correctly (verified with direct testing)
+- ✅ Render functions working correctly (verified with direct testing)
+- ✅ Air framework working correctly
+- ✅ All components working individually
+
+### **Root Cause**
+The issue was **server process management**, not code problems:
+1. **Multiple Server Processes**: Multiple FastAPI processes were running on port 8000
+2. **Port Conflicts**: New server couldn't start due to "Address already in use" errors
+3. **Stale Processes**: Old server processes weren't properly terminated
+4. **Database Connection**: Server was using cached/incorrect database connections
+
+### **The Solution**
+**Complete server process cleanup and restart:**
+
+```bash
+# 1. Kill all processes using port 8000
+lsof -ti:8000 | xargs kill -9
+
+# 2. Kill any remaining FastAPI processes
+pkill -f "fastapi dev"
+
+# 3. Restart server cleanly
+cd "/path/to/app" && uv run fastapi dev main.py --port 8000
+```
+
+### **Key Debugging Steps**
+1. **Database Verification**: Used direct Python script to verify database functions
+2. **Component Testing**: Tested render functions independently
+3. **Server Logs**: Added debug output to track card retrieval
+4. **Process Management**: Identified multiple server processes as the issue
+
+### **Lessons Learned**
+
+#### **For Development**
+1. **Process Management**: Always check for existing processes before starting new ones
+2. **Clean Restarts**: Use proper process termination, not just Ctrl+C
+3. **Port Conflicts**: Check for port usage with `lsof -ti:PORT`
+4. **Debug Strategy**: Test components independently when issues arise
+
+#### **For FastAPI Development**
+1. **Process Cleanup**: Use `lsof` and `pkill` for thorough cleanup
+2. **Port Management**: Verify port is free before starting server
+3. **Database Connections**: Ensure server uses correct database file
+4. **Auto-reload Issues**: Sometimes manual restart is needed for database changes
+
+### **Prevention Strategies**
+1. **Process Check**: Always verify no existing processes before starting server
+2. **Clean Shutdown**: Use proper termination methods
+3. **Port Verification**: Check port availability before starting
+4. **Database Path**: Ensure server runs from correct directory with correct database
+
+### **Key Takeaway**
+**Server process management is critical for FastAPI development.** Multiple processes can cause silent failures where code works but server doesn't reflect changes. Always ensure clean process management for reliable development.
+
+---
 *Date: October 13, 2025*  
 *Context: HW1 - 4. Assignment Development*  
 *Impact: High - Lost significant development session documentation*

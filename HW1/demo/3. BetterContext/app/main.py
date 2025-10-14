@@ -73,6 +73,10 @@ def index():
     with Session(engine) as session:
         mice_cards = db.get_all_mice_cards(session)
         try_cards = db.get_all_try_cards(session)
+        
+        # Debug: Print the number of cards found
+        print(f"DEBUG: Found {len(mice_cards)} MICE cards")
+        print(f"DEBUG: Found {len(try_cards)} Try cards")
 
         return story_builder_layout(
             air.Title("Story Builder"),
@@ -110,6 +114,8 @@ def index():
                         class_="flex flex-col gap-3",
                         id="mice-cards-list"
                     ),
+                    # Debug: Show number of cards
+                    air.Div(f"DEBUG: {len(mice_cards)} cards found", class_="text-red-500 font-bold"),
                     class_="border border-base-300 p-4"
                 ),
                 air.Div(

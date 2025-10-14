@@ -1,5 +1,5 @@
 import air
-from fastapi import Form, Response
+from fastapi import Form, Response, Request
 from sqlmodel import SQLModel, Session, create_engine
 from models import MiceCard, TryCard
 from layouts import story_builder_layout
@@ -68,21 +68,88 @@ def _templates_modal():
     )
 
 
-@app.get("/debug")
-def debug():
-    with Session(engine) as session:
-        mice_cards = db.get_all_mice_cards(session)
-        return f"Found {len(mice_cards)} MICE cards: {[card.code for card in mice_cards]}"
-
 @app.get("/")
 def index():
     with Session(engine) as session:
         mice_cards = db.get_all_mice_cards(session)
         try_cards = db.get_all_try_cards(session)
-        print(f"DEBUG: Found {len(mice_cards)} MICE cards and {len(try_cards)} Try cards")
 
         return story_builder_layout(
             air.Title("Story Builder"),
+            air.Script("""
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Initialize Sortable.js for Try cards
+                    const tryCardsList = document.getElementById('try-cards-list');
+                    if (tryCardsList) {
+                        new Sortable(tryCardsList, {
+                            handle: '.drag-handle',
+                            animation: 150,
+                            ghostClass: 'opacity-50',
+                            onEnd: function(evt) {
+                                // Get the new order of cards
+                                const cards = Array.from(tryCardsList.children);
+                                const newOrder = cards.map((card, index) => {
+                                    const cardId = card.id.replace('try-card-', '');
+                                    return { id: cardId, order: index + 1 };
+                                });
+                                
+                                // Send reorder request to server
+                                fetch('/reorder-try-cards', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ cards: newOrder })
+                                }).then(response => {
+                                    if (response.ok) {
+                                        // Update order numbers in the UI
+                                        cards.forEach((card, index) => {
+                                            const orderSpan = card.querySelector('.font-bold');
+                                            if (orderSpan) {
+                                                const text = orderSpan.textContent;
+                                                const newText = text.replace(/#\\d+/, `#${index + 1}`);
+                                                orderSpan.textContent = newText;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Initialize Sortable.js for MICE cards
+                    const miceCardsList = document.getElementById('mice-cards-list');
+                    if (miceCardsList) {
+                        new Sortable(miceCardsList, {
+                            handle: '.drag-handle',
+                            animation: 150,
+                            ghostClass: 'opacity-50',
+                            onEnd: function(evt) {
+                                // Get the new order of cards
+                                const cards = Array.from(miceCardsList.children);
+                                const newOrder = cards.map((card, index) => {
+                                    const cardId = card.id.replace('mice-card-', '');
+                                    return { id: cardId, order: index + 1 };
+                                });
+                                
+                                // Send reorder request to server
+                                fetch('/reorder-mice-cards', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ cards: newOrder })
+                                }).then(response => {
+                                    if (response.ok) {
+                                        // Update display order in the UI (no visual change needed since order is visual)
+                                        console.log('MICE cards reordered successfully');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            """),
             air.Div(
                 air.Button(
                     "Templates",
@@ -117,7 +184,6 @@ def index():
                         class_="flex flex-col gap-3",
                         id="mice-cards-list"
                     ),
-                    air.Div(f"DEBUG: {len(mice_cards)} cards found", class_="text-red-500"),
                     class_="border border-base-300 p-4"
                 ),
                 air.Div(
@@ -139,103 +205,14 @@ def index():
                 ),
                 air.Div(
                     air.H2("Generated Outline", class_="text-2xl font-bold mb-4"),
-                    air.Div(
-                        air.H3("Nesting Structure", class_="text-lg font-semibold mb-2"),
-                        air.Button(
-                            air.Span("🔄", class_="mr-2"),
-                            "Refresh After Card Changes",
-                            class_="btn btn-sm btn-outline mb-3",
-                            hx_get="/refresh-nesting",
-                            hx_target="#nesting-structure",
-                            hx_swap="innerHTML",
-                            title="Click to update the nesting structure with the latest card order"
-                        ),
-                        class_="flex items-center justify-between"
-                    ),
-                    air.Div(
-                        render_nesting_diagram(mice_cards),
-                        id="nesting-structure"
-                    ),
+                    air.H3("Nesting Structure", class_="text-lg font-semibold mb-2"),
+                    render_nesting_diagram(mice_cards),
                     air.H3("Story Timeline", class_="text-lg font-semibold mb-2 mt-6"),
                     render_story_timeline(mice_cards, try_cards),
                     class_="border border-base-300 p-4"
                 ),
                 class_="grid grid-cols-3 gap-4 w-full"
-            ),
-            air.Script("""
-                // Initialize drag-and-drop for both MICE and Try cards
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Initialize MICE cards drag-and-drop
-                    const miceCardsList = document.getElementById('mice-cards-list');
-                    if (miceCardsList) {
-                        new Sortable(miceCardsList, {
-                            handle: '.drag-handle',
-                            animation: 150,
-                            ghostClass: 'sortable-ghost',
-                            chosenClass: 'sortable-chosen',
-                            dragClass: 'sortable-drag',
-                            onEnd: function(evt) {
-                                // Get the new order of card IDs
-                                const cardIds = Array.from(miceCardsList.children).map(card => {
-                                    return card.id.replace('mice-card-', '');
-                                }).join(',');
-                                
-                                // Send reorder request to server
-                                fetch('/mice-cards/reorder', {
-                                    method: 'PUT',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                    },
-                                    body: 'card_ids=' + encodeURIComponent(cardIds)
-                                }).then(response => {
-                                    if (!response.ok) {
-                                        console.error('Failed to reorder MICE cards');
-                                        location.reload();
-                                    }
-                                }).catch(error => {
-                                    console.error('Error reordering MICE cards:', error);
-                                    location.reload();
-                                });
-                            }
-                        });
-                    }
-                    
-                    // Initialize Try cards drag-and-drop
-                    const tryCardsList = document.getElementById('try-cards-list');
-                    if (tryCardsList) {
-                        new Sortable(tryCardsList, {
-                            handle: '.drag-handle',
-                            animation: 150,
-                            ghostClass: 'sortable-ghost',
-                            chosenClass: 'sortable-chosen',
-                            dragClass: 'sortable-drag',
-                            onEnd: function(evt) {
-                                // Get the new order of card IDs
-                                const cardIds = Array.from(tryCardsList.children).map(card => {
-                                    return card.id.replace('try-card-', '');
-                                }).join(',');
-                                
-                                // Send reorder request to server
-                                fetch('/try-cards/reorder', {
-                                    method: 'PUT',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                    },
-                                    body: 'card_ids=' + encodeURIComponent(cardIds)
-                                }).then(response => {
-                                    if (!response.ok) {
-                                        console.error('Failed to reorder Try cards');
-                                        location.reload();
-                                    }
-                                }).catch(error => {
-                                    console.error('Error reordering Try cards:', error);
-                                    location.reload();
-                                });
-                            }
-                        });
-                    }
-                });
-            """)
+            )
         )
 
 
@@ -305,49 +282,16 @@ def mice_card(card_id: int):
             return ""
         return render_mice_card(card)
 
-@app.put("/mice-cards/reorder")
-def reorder_mice_cards(card_ids: str = Form(...)):
-    """Reorder MICE cards based on new order from drag-and-drop."""
-    try:
-        # Parse the comma-separated card IDs
-        card_id_list = [int(id.strip()) for id in card_ids.split(',') if id.strip()]
-        
-        with Session(engine) as session:
-            # Update order numbers based on new positions
-            for new_order, card_id in enumerate(card_id_list, 1):
-                db.update_mice_card_order(session, card_id, new_order)
-        
-        return Response(status_code=200)
-    except Exception as e:
-        return Response(status_code=400, content=f"Error reordering cards: {str(e)}")
-
-@app.put("/try-cards/reorder")
-def reorder_try_cards(card_ids: str = Form(...)):
-    """Reorder Try cards based on new order from drag-and-drop."""
-    try:
-        # Parse the comma-separated card IDs
-        card_id_list = [int(id.strip()) for id in card_ids.split(',') if id.strip()]
-        
-        with Session(engine) as session:
-            # Update order numbers based on new positions
-            for new_order, card_id in enumerate(card_id_list, 1):
-                db.update_try_card_order(session, card_id, new_order)
-        
-        return Response(status_code=200)
-    except Exception as e:
-        return Response(status_code=400, content=f"Error reordering cards: {str(e)}")
-
 @app.put("/mice-cards/{card_id}")
 def update_mice_card(
     card_id: int,
     code: str = Form(...),
     opening: str = Form(...),
     closing: str = Form(...),
-    nesting_level: int = Form(...),
-    order_num: int = Form(...)
+    nesting_level: int = Form(...)
 ):
     with Session(engine) as session:
-        card = db.update_mice_card(session, card_id, code, opening, closing, nesting_level, order_num)
+        card = db.update_mice_card(session, card_id, code, opening, closing, nesting_level)
         if not card:
             return ""
 
@@ -364,20 +308,12 @@ def create_mice_card(
     code: str = Form(...),
     opening: str = Form(...),
     closing: str = Form(...),
-    nesting_level: int = Form(...),
-    order_num: int = Form(...)
+    nesting_level: int = Form(...)
 ):
     with Session(engine) as session:
-        db.create_mice_card(session, code, opening, closing, nesting_level, order_num)
+        db.create_mice_card(session, code, opening, closing, nesting_level)
 
     return Response(status_code=200, headers={"HX-Redirect": "/"})
-
-@app.get("/refresh-nesting")
-def refresh_nesting():
-    """Refresh the nesting structure with the latest card order from database."""
-    with Session(engine) as session:
-        mice_cards = db.get_all_mice_cards(session)
-        return render_nesting_diagram(mice_cards)
 
 @app.get("/try-edit/{card_id}")
 def try_edit(card_id: int):
@@ -415,4 +351,32 @@ def delete_try_card(card_id: int):
     with Session(engine) as session:
         db.delete_try_card(session, card_id)
     return Response(status_code=200, headers={"HX-Redirect": "/"})
+
+@app.post("/reorder-try-cards")
+async def reorder_try_cards(request: Request):
+    """Reorder Try cards based on new order from drag-and-drop."""
+    data = await request.json()
+    cards = data.get("cards", [])
+    
+    with Session(engine) as session:
+        for card_data in cards:
+            card_id = int(card_data["id"])
+            new_order = int(card_data["order"])
+            db.update_try_card_order(session, card_id, new_order)
+    
+    return Response(status_code=200)
+
+@app.post("/reorder-mice-cards")
+async def reorder_mice_cards(request: Request):
+    """Reorder MICE cards based on new display order from drag-and-drop."""
+    data = await request.json()
+    cards = data.get("cards", [])
+    
+    with Session(engine) as session:
+        for card_data in cards:
+            card_id = int(card_data["id"])
+            new_order = int(card_data["order"])
+            db.update_mice_card_display_order(session, card_id, new_order)
+    
+    return Response(status_code=200)
 

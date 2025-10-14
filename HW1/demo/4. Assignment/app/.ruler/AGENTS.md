@@ -1,7 +1,3 @@
-
-
-<!-- Source: .ruler/AGENTS.md -->
-
 # AGENTS.md
 
 Centralised AI agent instructions. Add coding guidelines, style guides, and project context here.

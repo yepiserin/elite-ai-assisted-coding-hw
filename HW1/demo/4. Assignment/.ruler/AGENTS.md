@@ -1,8 +1,3 @@
----
-alwaysApply: true
----
-<!-- Source: .ruler/AGENTS.md -->
-
 # Elite AI Assisted Coding - Homework Guidelines
 
 This repository contains homework assignments for the Elite AI Assisted Coding Course. All AI agents should follow these guidelines when working on any assignment.

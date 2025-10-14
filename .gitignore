@@ -207,3 +207,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# START Ruler Generated Files
+/.cursorrules
+/.cursorrules.bak
+/.github/copilot-instructions.md
+/.github/copilot-instructions.md.bak
+/CLAUDE.md
+/CLAUDE.md.bak
+# END Ruler Generated Files

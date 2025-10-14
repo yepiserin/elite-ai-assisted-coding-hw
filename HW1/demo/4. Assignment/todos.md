@@ -2,57 +2,66 @@
 
 Each step below adds one complete, testable feature. After each step, you should test the feature as a user would before proceeding.
 
-## Step 1: Verify starter app runs
-- Ensure the Air starter app runs successfully
-- Verify you can access the homepage in a browser
-- Confirm the app uses the correct Python environment
+## Step 1: Verify starter app runs ✅
+- ✅ Ensure the Air starter app runs successfully
+- ✅ Verify you can access the homepage in a browser
+- ✅ Confirm the app uses the correct Python environment
 
-## Step 2: Set up database with MICE cards table
-- Create SQLite database (`story_builder.db`)
-- Add `mice_cards` table with schema: id, story_id, code, opening, closing, nesting_level
-- Add a basic endpoint to insert one sample MICE card
-- Verify database file exists and contains the sample data
+## Step 2: Set up database with MICE cards table ✅
+- ✅ Create SQLite database (`story_builder.db`)
+- ✅ Add `mice_cards` table with schema: id, story_id, code, opening, closing, nesting_level
+- ✅ Add a basic endpoint to insert one sample MICE card
+- ✅ Verify database file exists and contains the sample data
 
-## Step 3: Set up Try cards table
-- Add `try_cards` table with schema: id, story_id, type, attempt, failure, consequence, order_num
-- Add a basic endpoint to insert one sample Try card
-- Verify the table exists and contains the sample data
+## Step 3: Set up Try cards table ✅
+- ✅ Add `try_cards` table with schema: id, story_id, type, attempt, failure, consequence, order_num
+- ✅ Add a basic endpoint to insert one sample Try card
+- ✅ Verify the table exists and contains the sample data
 
-## Step 4: Create three-column page layout
-- Update home.html with a three-column CSS grid layout
-- Left column: "MICE Cards" header
-- Center column: "Try/Fail Cycles" header
-- Right column: "Generated Outline" header
-- Add basic CSS styling for the grid (fixed widths, borders)
-- Verify the three columns display side-by-side
+## Step 4: Create three-column page layout ✅
+- ✅ Update home.html with a three-column CSS grid layout
+- ✅ Left column: "MICE Cards" header
+- ✅ Center column: "Try/Fail Cycles" header
+- ✅ Right column: "Generated Outline" header
+- ✅ Add basic CSS styling for the grid (fixed widths, borders)
+- ✅ Verify the three columns display side-by-side
 
-## Step 5: Display MICE cards from database
-- Create endpoint to fetch all MICE cards from database
-- Display MICE cards in left column as styled cards (200px height, 290px width)
-- Show card type, opening text (truncated), closing text (truncated), nesting level
-- Add color coding for M, I, C, E types
-- Verify cards display correctly with proper styling
+## Step 5: Display MICE cards from database ✅
+- ✅ Create endpoint to fetch all MICE cards from database
+- ✅ Display MICE cards in left column as styled cards (200px height, 290px width)
+- ✅ Show card type, opening text (truncated), closing text (truncated), nesting level
+- ✅ Add color coding for M, I, C, E types
+- ✅ Verify cards display correctly with proper styling
 
-## Step 6: Add "Create MICE Card" form and functionality
-- Add "Add MICE Card" button above MICE cards
-- Create form with: type selector (M/I/C/E), opening textarea, closing textarea, nesting level input
-- Create POST endpoint to save new MICE card to database
-- Form saves card and refreshes display
-- Verify you can add new MICE cards and see them appear
+## Step 6: Add "Create MICE Card" form and functionality ✅
+- ✅ Add "Add MICE Card" button above MICE cards
+- ✅ Create form with: type selector (M/I/C/E), opening textarea, closing textarea, nesting level input
+- ✅ Create POST endpoint to save new MICE card to database
+- ✅ Form saves card and refreshes display
+- ✅ Verify you can add new MICE cards and see them appear
 
-## Step 7: Add Edit and Delete for MICE cards
-- Add "Edit" button on each MICE card (replaces card with filled form)
-- Add "Delete" button on each MICE card (removes immediately)
-- Create PUT and DELETE endpoints
-- Verify you can edit and delete MICE cards
+## Step 7: Add Edit and Delete for MICE cards ✅
+- ✅ Add "Edit" button on each MICE card (replaces card with filled form)
+- ✅ Add "Delete" button on each MICE card (removes immediately)
+- ✅ Create PUT and DELETE endpoints
+- ✅ Verify you can edit and delete MICE cards
 
-## Step 8: Display Try cards from database
-- Create endpoint to fetch all Try cards from database
-- Display Try cards in center column as styled cards (175px height)
-- Show cycle type, order number, attempt, outcome, consequence (all truncated)
-- Add color coding for the four cycle types
-- Add drag handle icon (⋮⋮) to each card
-- Verify cards display correctly with proper styling
+## Step 8: Display Try cards from database ✅
+- ✅ Create endpoint to fetch all Try cards from database
+- ✅ Display Try cards in center column as styled cards (175px height)
+- ✅ Show cycle type, order number, attempt, outcome, consequence (all truncated)
+- ✅ Add color coding for the four cycle types
+- ✅ Add drag handle icon (⋮⋮) to each card
+- ✅ Add drag-and-drop functionality with Sortable.js
+- ✅ Verify cards display correctly with proper styling
+
+## Step 8.5: Add drag-and-drop to MICE cards ✅
+- ✅ Add drag handle icon (⋮⋮) to MICE cards
+- ✅ Add drag-and-drop functionality with Sortable.js for MICE cards
+- ✅ Add database function to update MICE card nesting levels
+- ✅ Add endpoint to handle MICE card reordering
+- ✅ Update nesting levels in real-time after drag-and-drop
+- ✅ Verify MICE cards can be reordered by dragging
 
 ## Step 9: Add "Create Try Card" form and functionality
 - Add "Add Try Card" button above Try cards
@@ -120,7 +129,7 @@ Each step below adds one complete, testable feature. After each step, you should
 - Add loading state while AI processes
 - Verify outline generates and displays
 
-## Step 10: Polish and refinement
+## Step 19: Polish and refinement
 - Review all features for consistency
 - Ensure all automatic updates work correctly
 - Verify color coding and styling throughout

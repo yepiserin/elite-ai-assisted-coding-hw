@@ -1,6 +1,5 @@
----
-alwaysApply: true
----
+
+
 <!-- Source: .ruler/AGENTS.md -->
 
 # Elite AI Assisted Coding - Homework Guidelines
