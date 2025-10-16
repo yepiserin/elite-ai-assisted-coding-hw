@@ -54,11 +54,20 @@ This repository contains homework assignments for the Elite AI Assisted Coding C
 
 ## Development Workflow
 
-1. **Read Requirements**: Always start by reading the assignment requirements in `plan.md` and `todos.md`
-2. **Understand Context**: Review the MICE Quotient methodology in `mice.md`
-3. **Implement Features**: Build real functionality following the guidelines above
-4. **Test Thoroughly**: Use browser automation to verify functionality
-5. **Document Changes**: Update relevant documentation files
+1. **Session Setup**: Always prompt user to start specstory recording at the beginning of each new session
+2. **Read Requirements**: Always start by reading the assignment requirements in `plan.md` and `todos.md`
+3. **Understand Context**: Review the MICE Quotient methodology in `mice.md`
+4. **Implement Features**: Build real functionality following the guidelines above
+5. **Test Thoroughly**: Use browser automation to verify functionality
+6. **Document Changes**: Update relevant documentation files
+
+## Session Management
+
+### Specstory Integration
+- **Auto-prompt**: At the start of every new Cursor/VS Code session, prompt the user to start specstory recording
+- **Root folder selection**: Ask the user which root folder specstory should be applied to for the current session
+- **Inactivity timeout**: Configure specstory to automatically stop recording after 30 minutes of inactivity
+- **Session persistence**: Maintain specstory session across file changes and development work
 
 ## File Organization
 
